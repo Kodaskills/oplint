@@ -1,0 +1,9 @@
+{
+  "rules": {
+    "enabled": "all",
+    "disabled": []
+  },
+  "SEC001": {
+    "severity": "error"
+  }
+}

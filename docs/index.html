@@ -1,0 +1,629 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-TSSQ2HZX');</script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="index, follow" />
+<title>OPLint — Obsidian Plugin Linter</title>
+<meta name="description" content="Static analysis CLI for Obsidian plugin compliance — security, manifest validation, mobile compatibility, API best practices, and UI guidelines. 50+ rules, tree-sitter AST-based, written in Rust." />
+<meta name="theme-color" content="#0a0b10" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="OPLint — Obsidian Plugin Linter" />
+<meta property="og:description" content="Static analysis CLI for Obsidian plugin compliance — security, manifest validation, mobile compatibility, API best practices, and UI guidelines. 50+ rules, tree-sitter AST-based, written in Rust." />
+<link rel="icon" href="logo.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="landing.css">
+</head>
+<body>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TSSQ2HZX"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<!-- soft animated grid backdrop -->
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="bg-glow" aria-hidden="true"></div>
+
+<!-- ───────── NAV ───────── -->
+<header class="nav">
+  <nav class="nav-inner" aria-label="Main navigation">
+    <a class="brand" href="#top">
+      <span class="brand-mark">
+        <img src="logo.svg" alt="oplint logo" width="24" height="24" />
+      </span>
+      <span class="brand-name">oplint</span>
+    </a>
+    <div class="nav-links">
+      <a href="#why">Why</a>
+      <a href="#features">Features</a>
+      <a href="#install">Install</a>
+      <a href="#how">Use</a>
+      <a href="#rules">Rules</a>
+      <a href="#ci">CI</a>
+      <a href="#roadmap">Roadmap</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="nav-actions">
+      <a class="btn btn-ghost" href="https://github.com/kodaskills/oplint" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 0 0-2.5 15.6c.4.07.55-.17.55-.38v-1.34c-2.2.48-2.67-1.06-2.67-1.06-.36-.92-.88-1.16-.88-1.16-.72-.49.05-.48.05-.48.8.06 1.22.82 1.22.82.71 1.21 1.86.86 2.31.66.07-.51.28-.86.5-1.06-1.76-.2-3.6-.88-3.6-3.92 0-.87.31-1.58.82-2.13-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.81a7.6 7.6 0 0 1 4 0c1.53-1.02 2.2-.81 2.2-.81.44 1.1.16 1.92.08 2.12.51.55.82 1.26.82 2.13 0 3.05-1.85 3.72-3.61 3.91.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 8 0Z"/></svg>
+        GitHub
+      </a>
+      <a class="btn btn-primary" href="#install">
+        Install
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="m4 2 4 4-4 4"/></svg>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<main id="top">
+
+  <!-- ───────── HERO ───────── -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <a class="badge" href="#install">
+          <span class="badge-dot"></span>
+          <span>v0.1.0 · Built in Rust</span>
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="m4 2 4 4-4 4"/></svg>
+        </a>
+        <h1 class="h1 reveal">
+          <span class="word">Ship</span>
+          <span class="word">Obsidian</span>
+          <span class="word">plugins</span>
+          <span class="word">that</span>
+          <span class="word"><em>actually</em></span>
+          <span class="h1-cycle">
+            <span class="h1-phrase is-active">pass review.</span>
+            <span class="h1-phrase">delight users.</span>
+            <span class="h1-phrase">earn five stars.</span>
+            <span class="h1-phrase">run everywhere.</span>
+            <span class="h1-phrase">feel polished.</span>
+          </span>
+        </h1>
+        <p class="lede reveal" style="--d:.4s">
+          <strong>oplint</strong> is a static-analysis CLI for the Obsidian plugin guidelines.
+          50+ tree-sitter rules across security, manifest, mobile, API and UI —
+          with HTML, JSON, Markdown reports and a one-line GitHub Action.
+        </p>
+        <div class="hero-cta reveal" style="--d:.55s">
+          <a class="btn btn-primary btn-lg" href="#install">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11.5V13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1.5M8 2v8m0 0L5 7m3 3 3-3"/></svg>
+            Just install oplint
+          </a>
+          <a class="btn btn-ghost btn-lg" href="https://github.com/kodaskills/oplint" target="_blank" rel="noopener">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 0 0-2.5 15.6c.4.07.55-.17.55-.38v-1.34c-2.2.48-2.67-1.06-2.67-1.06-.36-.92-.88-1.16-.88-1.16-.72-.49.05-.48.05-.48.8.06 1.22.82 1.22.82.71 1.21 1.86.86 2.31.66.07-.51.28-.86.5-1.06-1.76-.2-3.6-.88-3.6-3.92 0-.87.31-1.58.82-2.13-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.81a7.6 7.6 0 0 1 4 0c1.53-1.02 2.2-.81 2.2-.81.44 1.1.16 1.92.08 2.12.51.55.82 1.26.82 2.13 0 3.05-1.85 3.72-3.61 3.91.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 8 0Z"/></svg>
+            View on GitHub
+          </a>
+          <a class="btn btn-ghost btn-lg" href="https://crates.io/crates/oplint" target="_blank" rel="noopener">
+              <svg width="14" height="14" viewBox="0 0 24 24"  fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"></path></svg>
+            crates.io
+          </a>
+        </div>
+
+        <div class="hero-stats reveal" style="--d:.7s">
+          <div class="stat">
+            <div class="stat-n">🛡️ <span data-count="51">0</span></div>
+            <div class="stat-l">Rules</div>
+          </div>
+          <div class="stat">
+            <div class="stat-n">🧩 <span data-count="11">0</span></div>
+            <div class="stat-l">Categories</div>
+          </div>
+          <div class="stat">
+            <div class="stat-n">📦 <span data-count="7">0</span></div>
+            <div class="stat-l">Output<br>formats</div>
+          </div>
+          <div class="stat">
+            <div class="stat-n">✨ <span data-count="99" data-suffix="%">0</span></div>
+            <div class="stat-l">Guidelines covered<span class="stat-sub">≈ 100% with <code>approx</code> rules</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- terminal → report demo -->
+      <div class="hero-demo" id="demo">
+        <div class="demo-stack">
+
+          <!-- terminal -->
+          <div class="terminal" id="terminal">
+            <div class="terminal-bar">
+              <span class="dot dot-r"></span>
+              <span class="dot dot-y"></span>
+              <span class="dot dot-g"></span>
+              <span class="terminal-title">~/my-plugin · zsh</span>
+            </div>
+            <div class="terminal-body" id="term-body"></div>
+          </div>
+
+          <!-- report card that slides up -->
+          <div class="report-card" id="report-card">
+            <div class="rc-bar">
+              <span class="dot dot-r"></span>
+              <span class="dot dot-y"></span>
+              <span class="dot dot-g"></span>
+              <span class="rc-url">report.html</span>
+            </div>
+            <div class="rc-body">
+              <div class="rc-head">
+                <div>
+                  <div class="rc-title">Plugin Compliance Report</div>
+                  <div class="rc-sub">my-plugin v1.0.2 · 42 files · 4 318 LOC</div>
+                </div>
+                <div class="rc-score">
+                  <div class="ring" style="--p:78">
+                    <div class="ring-num">78</div>
+                  </div>
+                  <div>
+                    <div class="rc-grade">B+ · Good</div>
+                    <div class="rc-delta">▲ +6 vs last run</div>
+                  </div>
+                </div>
+              </div>
+              <div class="rc-counts">
+                <div class="rc-count err"><b>3</b><span>Errors</span></div>
+                <div class="rc-count warn"><b>11</b><span>Warnings</span></div>
+                <div class="rc-count info"><b>6</b><span>Info</span></div>
+                <div class="rc-count pass"><b>68</b><span>Passing</span></div>
+              </div>
+              <div class="rc-bars">
+                <div class="rc-row"><span>Security</span><div class="bar"><span class="b-err" style="width:22%"></span><span class="b-warn" style="width:11%"></span><span class="b-pass" style="width:67%"></span></div></div>
+                <div class="rc-row"><span>API Usage</span><div class="bar"><span class="b-err" style="width:8%"></span><span class="b-warn" style="width:15%"></span><span class="b-info" style="width:8%"></span><span class="b-pass" style="width:69%"></span></div></div>
+                <div class="rc-row"><span>Mobile</span><div class="bar"><span class="b-err" style="width:20%"></span><span class="b-warn" style="width:20%"></span><span class="b-pass" style="width:60%"></span></div></div>
+                <div class="rc-row"><span>UX &amp; Styling</span><div class="bar"><span class="b-warn" style="width:12%"></span><span class="b-info" style="width:12%"></span><span class="b-pass" style="width:76%"></span></div></div>
+                <div class="rc-row"><span>Manifest</span><div class="bar"><span class="b-warn" style="width:16%"></span><span class="b-info" style="width:16%"></span><span class="b-pass" style="width:68%"></span></div></div>
+              </div>
+              <a class="rc-open" href="https://github.com/kodaskills/oplint">
+                View on GitHub
+                <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="m4 2 4 4-4 4"/></svg>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+   <!-- ───────── WHY ───────── -->
+   <section class="section" id="why">
+     <div class="section-head">
+       <span class="eyebrow">Why oplint</span>
+       <h2 class="h2">The Obsidian guidelines are <em>strong</em> 💪.<br>Your workflow should be fast ⚡!</h2>
+     </div>
+
+     <div class="why-grid">
+      <article class="why-card why-card-impact">
+        <div class="why-header">
+          <div class="why-num">01 IMPACT</div>
+          <div class="why-badge">Most critical</div>
+        </div>
+        <h3>Bad plugins break<span class="word-highlight wh-ux"><span>user</span> <span>experience</span></span></h3>
+        <p>Non‑compliant plugins cause slowdowns, weird UI behavior, or silent mobile crashes. Following the guidelines is the best way to avoid these real issues before users ever notice them.</p>
+      </article>
+       <article class="why-card">
+         <div class="why-num">02 EFFICIENCY</div>
+         <h3>Plugin reviews are<span class="word-highlight wh-slow">slow</span></h3>
+         <p>Verifying code on a loop flags the same dozen issues over and over — <code>innerHTML</code>, missing <code>onunload</code>, hardcoded styles, sample-plugin leftovers. Catch them locally before you open the PR.</p>
+       </article>
+       <article class="why-card">
+         <div class="why-num">03 PANIC</div>
+         <h3>Mobile breaks<span class="word-highlight wh-silent">silently</span></h3>
+         <p>Lookbehind regex, <code>navigator.userAgent</code>, raw <code>window.setTimeout</code> — none of it errors at compile time. oplint flags every mobile-incompatible API <em>unless</em> your manifest sets <code>isDesktopOnly</code>.</p>
+       </article>
+       <article class="why-card">
+         <div class="why-num">04 SCHEMA</div>
+         <h3>Manifests are<span class="word-highlight wh-fiddly">fiddly</span></h3>
+         <p>Twelve required-field, ID-format and description rules. Validated against the same schema Obsidian's reviewers use, with copyright-notice and sample-ID checks built in.</p>
+       </article>
+       <article class="why-card">
+         <div class="why-num">05 STANDARD</div>
+         <h3>Style guidelines are<span class="word-highlight wh-subtle">subtle</span></h3>
+         <p>Sentence case, no top-level settings headings, <code>setHeading()</code> over <code>h1</code>, no inline <code>style=</code> attributes. The kind of thing a reviewer notices and a linter should catch.</p>
+       </article>
+       <article class="why-card">
+         <div class="why-num">06 TOKENS</div>
+         <h3>AI loops are <span class="word-highlight wh-costly">costly</span></h3>
+         <p>Every rejected submission means another AI prompt to fix the same issue. oplint catches the mechanical problems before you submit — so your agent spends tokens on the interesting work, not on the same 12 checklist items.</p>
+       </article>
+     </div>
+   </section>
+
+  <!-- ───────── FEATURES ───────── -->
+  <section class="section" id="features">
+    <div class="section-head">
+      <span class="eyebrow">Features</span>
+      <h2 class="h2">Built for plugin authors 👩🏽‍💻,<br>not for linter authors 🥋.</h2>
+    </div>
+
+    <div class="feat-grid">
+      <article class="feat feat-wide">
+        <div class="feat-ico ico-tree">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="4" r="2"/><circle cx="6" cy="20" r="2"/><circle cx="18" cy="20" r="2"/><path d="M12 6v4M6 18v-4h12v4M12 10v4"/></svg>
+        </div>
+        <h3>tree-sitter AST, not regex</h3>
+        <p>Real syntax trees mean fewer false positives on strings, comments and template literals. Each rule is tagged <span class="tag exact">exact</span> or <span class="tag approx">approximate</span> so you know what you're trusting.</p>
+      </article>
+
+      <article class="feat">
+        <div class="feat-ico ico-rust"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 9 5H4v5L1 12l3 2v5h5l3 3 3-3h5v-5l3-2-3-2V5h-5l-3-3Z"/></svg></div>
+        <h3>Fast by default</h3>
+        <p>Written in Rust. Lints a typical plugin between <code>500ms</code> and <code>5s</code> ⚡️ on cold cache.</p>
+        <p>Now with built‑in concurrency — processes files in parallel so multi‑file projects stay just as snappy.</p>
+      </article>
+
+      <article class="feat">
+        <div class="feat-ico ico-formats">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 3h9l5 5v13H5V3Z"/><path d="M14 3v5h5"/></svg>
+        </div>
+        <h3>7 output formats</h3>
+        <p>Table · Terminal · HTML · Markdown · JSON · YAML · TOML — all with a 0-100 score and grade.</p>
+      </article>
+
+      <article class="feat">
+        <div class="feat-ico ico-config">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2.1-1.2L14 3h-4l-.5 2.6a7 7 0 0 0-2.1 1.2l-2.3-.9-2 3.4 2 1.5A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.4 2.3-.9c.6.5 1.3.9 2.1 1.2L10 21h4l.5-2.6c.8-.3 1.5-.7 2.1-1.2l2.3.9 2-3.4-2-1.5c.1-.4.1-.8.1-1.2Z"/></svg>
+        </div>
+        <h3>Configurable severity</h3>
+        <p>Override rule severity per-project. Skip whole accuracy levels (e.g. <code>approximate</code>) to dial down noise.</p>
+      </article>
+
+      <article class="feat">
+        <div class="feat-ico ico-custom">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 4 4 9l5 5M15 4l5 5-5 5M14 4l-4 16"/></svg>
+        </div>
+        <h3>Custom rules</h3>
+        <p>Drop a tree-sitter query into <code>.oplint.yaml</code> and you have a new rule. <code>match</code> or <code>not-match</code>.</p>
+      </article>
+
+      <article class="feat">
+        <div class="feat-ico ico-mobile">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg>
+        </div>
+        <h3>Mobile-aware</h3>
+        <p>Mobile rules auto-skip when <code>isDesktopOnly: true</code>. No false positives for desktop-only plugins.</p>
+      </article>
+
+      <article class="feat feat-wide">
+        <div class="feat-ico ico-ci">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        </div>
+        <h3>GitHub Action, ready to drop in</h3>
+        <p>Lint on push, post a Markdown summary on the PR, attach the HTML report as an artifact, and stamp a compliance badge on your README. One YAML, zero plumbing.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ───────── INSTALL ───────── -->
+  <section class="section" id="install">
+    <div class="section-head">
+      <span class="eyebrow">Install</span>
+      <h2 class="h2">Four ways in 🎟️.</h2>
+    </div>
+    <div class="install-grid">
+      <div class="install-card">
+        <div class="install-head">
+          <span class="install-tag">Recommended</span>
+          <h3>One-liner</h3>
+        </div>
+        <pre class="snippet snippet-lg" style="overflow-x:auto"><code><span class="tok-p">$</span> curl -fsSL https://raw.githubusercontent.com/kodaskills/oplint/main/install.sh | sh</code><button class="copy-btn" aria-label="Copy to clipboard" data-copy="curl -fsSL https://raw.githubusercontent.com/kodaskills/oplint/main/install.sh | sh"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></pre>
+        <p class="muted">macOS &amp; Linux. Detects your OS and arch, installs to <code>/usr/local/bin</code>. No Rust required.</p>
+      </div>
+      <div class="install-card">
+        <div class="install-head">
+          <span class="install-tag tag-alt">From crates.io</span>
+          <h3>Via cargo</h3>
+        </div>
+        <pre class="snippet snippet-lg"><code><span class="tok-p">$</span> cargo install oplint
+<span class="tok-p">$</span> oplint <span class="tok-k">--help</span></code><button class="copy-btn" aria-label="Copy to clipboard" data-copy="cargo install oplint"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></pre>
+        <p class="muted">Requires Rust 1.74+. Binary lands in <code>~/.cargo/bin</code>.</p>
+      </div>
+      <div class="install-card">
+        <div class="install-head">
+          <span class="install-tag tag-alt">From source</span>
+          <h3>Build it yourself</h3>
+        </div>
+        <pre class="snippet snippet-lg"><code><span class="tok-p">$</span> git clone https://github.com/kodaskills/oplint
+<span class="tok-p">$</span> <span class="tok-k">cd</span> oplint
+<span class="tok-p">$</span> cargo build <span class="tok-k">--release</span>
+<span class="tok-p">$</span> ./target/release/oplint <span class="tok-k">--help</span></code><button class="copy-btn" aria-label="Copy to clipboard" data-copy="git clone https://github.com/kodaskills/oplint"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></pre>
+        <p class="muted">Useful if you want to contribute custom rules upstream.</p>
+      </div>
+      <div class="install-card">
+        <div class="install-head">
+          <span class="install-tag tag-alt">Pre-built binary</span>
+          <h3>Download from GitHub</h3>
+        </div>
+        <p class="muted">All platforms (Linux, macOS, Windows) on the <a href="https://github.com/kodaskills/oplint/releases/latest" target="_blank" rel="noopener">latest release page</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── HOW ───────── -->
+  <section class="section" id="how">
+    <div class="section-head">
+      <span class="eyebrow">How it works</span>
+      <h2 class="h2">Easy as a breeze ✨.</h2>
+    </div>
+    <ol class="how" role="list">
+      <li>
+        <div class="how-num">A</div>
+        <h3>Lint and report in your terminal</h3>
+        <pre class="snippet"><code><span class="tok-c"># pretty table in your terminal</span>
+<span class="tok-p">$</span> oplint lint . -f table</code><button class="copy-btn" aria-label="Copy to clipboard" data-copy="oplint lint . -f table"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></pre>
+      </li>
+      <li>
+        <div class="how-num">B</div>
+        <h3>Clear readable report</h3>
+        <pre class="snippet"><code><span class="tok-c"># render an HTML report</span>
+<span class="tok-p">$</span> oplint lint . -f html <span class="tok-k">&gt;</span> oplint-report.html</code><button class="copy-btn" aria-label="Copy to clipboard" data-copy="oplint lint . -f html > oplint-report.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></pre>
+      </li>
+      <li>
+        <div class="how-num">C</div>
+        <h3>Won't choose?</h3>
+        <pre class="snippet"><code><span class="tok-c"># render any reports you need</span>
+<span class="tok-p">$</span> cargo run lint -f html,tom,yaml,json,table -o ./reporting</code><button class="copy-btn" aria-label="Copy to clipboard" data-copy="cargo run lint -f html,tom,yaml,json,table -o ./reporting"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></pre>
+      </li>
+      <li>
+        <div class="how-num">D</div>
+        <h3>Need help?</h3>
+        <pre class="snippet"><code><span class="tok-c"># show help</span>
+<span class="tok-p">$</span> oplint --help</code><button class="copy-btn" aria-label="Copy to clipboard" data-copy="oplint --help"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></pre>
+      </li>
+      <li>
+        <div class="how-num">E</div>
+        <h3>Need to configure?</h3>
+        <pre class="snippet"><code><span class="tok-c"># Initialize the configuration file</span>
+<span class="tok-p">$</span> oplint init <span class="tok-c"># default yaml</span>
+<span class="tok-p">$</span> oplint init -f json <span class="tok-c"># json format</span>
+<span class="tok-p">$</span> oplint init -f toml <span class="tok-c"># toml format</span></code><button class="copy-btn" aria-label="Copy to clipboard" data-copy="oplint init"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></pre>
+      </li>
+      <li>
+        <div class="how-num">F</div>
+        <h3>Or Just want list rules?</h3>
+        <pre class="snippet"><code><span class="tok-c"># list rules as is</span>
+<span class="tok-p">$</span> oplint rules</code><button class="copy-btn" aria-label="Copy to clipboard" data-copy="oplint rules"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></pre>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ───────── RULES ───────── -->
+  <section class="section" id="rules">
+    <div class="section-head">
+      <span class="eyebrow">Rule catalog</span>
+      <h2 class="h2">50+ rules, 11 categories, all transparent ⭐.</h2>
+      <p class="lede-sm">Every rule has an ID, severity and accuracy tag. Approximate rules say so — you can disable them globally in one line of config.</p>
+    </div>
+    <div class="rules-tabs" id="rules-tabs"></div>
+    <div class="rules-table-wrap">
+      <table class="rules-table" id="rules-table"></table>
+    </div>
+
+    <div class="rules-cta">
+      <p>You have encountered a rule that doesn't fit your use case? You want to add a new guideline rule for the good of the community?</p>
+      <div class="rules-btns">
+        <a class="btn btn-outlined" href="https://github.com/kodaskills/oplint/issues/new?template=feature_request" target="_blank" rel="noopener">Open an issue</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── CI / GH ACTION ───────── -->
+  <section class="section" id="ci">
+    <div class="section-head">
+      <span class="eyebrow">GitHub Action</span>
+      <h2 class="h2">Drop it in. Get a badge 🛡️.</h2>
+    </div>
+    <div class="ci-grid">
+      <div class="ci-yaml">
+        <pre class="snippet snippet-lg" style="overflow-x:auto"><code><span class="tok-c"># .github/workflows/lint.yml</span>
+<span class="tok-k">name</span>: <span class="tok-s">Plugin compliance</span>
+<span class="tok-k">on</span>: [push, pull_request]
+
+<span class="tok-k">jobs</span>:
+  <span class="tok-k">lint</span>:
+    <span class="tok-k">runs-on</span>: ubuntu-latest
+    <span class="tok-k">steps</span>:
+      - <span class="tok-k">uses</span>: actions/checkout@v4
+      - <span class="tok-k">name</span>: <span class="tok-s">Run OPLint</span>
+        <span class="tok-k">id</span>: oplint
+        <span class="tok-k">uses</span>: <span class="tok-s">kodaskills/oplint-action@v1</span>
+        <span class="tok-k">with</span>:
+          <span class="tok-k">path</span>: .
+          <span class="tok-k">summary</span>: <span class="tok-s">'true'</span>
+          <span class="tok-k">comment</span>: <span class="tok-s">'true'</span>
+          <span class="tok-k">badge</span>:
+            <span class="tok-k">enabled</span>: true
+            <span class="tok-k">endpoint</span>: true
+            <span class="tok-k">endpoint_output</span>: <span class="tok-s">.oplint-badge.json</span>
+            <span class="tok-k">style</span>: <span class="tok-s">for-the-badge</span>
+          <span class="tok-k">reporting</span>:
+            <span class="tok-k">enabled</span>: true
+            <span class="tok-k">formats</span>: <span class="tok-s">md,html</span>
+            <span class="tok-k">output_dir</span>: <span class="tok-s">reports/</span></code></pre>
+      </div>
+      <div class="ci-perks">
+        <div class="perk">
+          <div class="perk-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2.5" width="12" height="11" rx="1.5"/><path d="M5 6h6M5 9h4"/></svg></div>
+          <div>
+            <h4>GitHub Summary</h4>
+            <p>Markdown report rendered in the run summary, with severity counts and category bars.</p>
+          </div>
+        </div>
+        <div class="perk">
+          <div class="perk-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4.5C3 3.7 3.7 3 4.5 3h7c.8 0 1.5.7 1.5 1.5v5c0 .8-.7 1.5-1.5 1.5H7l-3 2.5V11h-.5C2.7 11 2 10.3 2 9.5v-5C2 3.7 2.7 3 3.5 3"/></svg></div>
+          <div>
+            <h4>PR comment</h4>
+            <p>Sticky comment with the score delta vs main, top offenders, and a link to the full HTML artifact.</p>
+          </div>
+        </div>
+        <div class="perk">
+          <div class="perk-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1.5" y="5" width="13" height="6" rx="2"/><path d="M5 8h6"/></svg></div>
+          <div>
+            <h4>Compliance badge</h4>
+            <p>Auto-published shields.io endpoint with score, grade and color. <span class="badge-row"><span class="shield"><span class="s-l">oplint</span><span class="s-r">B+ · 78</span></span></span></p>
+          </div>
+        </div>
+        <div class="perk">
+          <div class="perk-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.5 4h11M2.5 8h11M2.5 12h7"/></svg></div>
+          <div>
+            <h4>HTML artifact</h4>
+            <p>The full interactive report (the same one you saw in the hero) attached to every run.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── ROADMAP ───────── -->
+  <section class="section" id="roadmap">
+    <div class="section-head">
+      <span class="eyebrow">Roadmap</span>
+      <h2 class="h2">Where we're aiming 📅.</h2>
+      <p class="lede-sm">oplint is a starter project from the Kodaskills team. It already covers ~99% <i>(💯 if we include <code>approximate</code> rules)</i> of the published Obsidian plugin guidelines. If the Obsidian team and community find it useful, here's what's next.</p>
+    </div>
+
+    <div class="road">
+      <div class="road-col">
+        <div class="road-tag tag-now">Shipped</div>
+        <ul class="road-list" role="list">
+          <li><span class="rl-dot ok"></span>50+ rules across 11 categories</li>
+          <li><span class="rl-dot ok"></span>including 15+ custom semantic rules (in Rust)</li>
+          <li><span class="rl-dot ok"></span>tree-sitter syntax queries</li>
+          <li><span class="rl-dot ok"></span>HTML / JSON / Markdown / YAML / TOML reports</li>
+          <li><span class="rl-dot ok"></span>Custom rules via <code>.oplint.yaml</code></li>
+          <li><span class="rl-dot ok"></span>GitHub Action — lint, summary, PR comment, badge</li>
+          <li><span class="rl-dot ok"></span>Compliance score, grade and per-file performance</li>
+        </ul>
+      </div>
+      <div class="road-col">
+        <div class="road-tag tag-next">If there's interest</div>
+        <ul class="road-list" role="list">
+          <li><span class="rl-dot next"></span>Full AST <em>semantic</em> analysis — bring approximate rules to <code>exact</code></li>
+          <li><span class="rl-dot next"></span>Auto-fix for the safe subset (innerHTML → setText, var → const, sentence-case, …)</li>
+          <li><span class="rl-dot next"></span>VS Code / Obsidian editor extension with inline diagnostics</li>
+          <li><span class="rl-dot next"></span>Community-contributed rule packs</li>
+          <li><span class="rl-dot next"></span>Watch mode for local dev</li>
+          <li><span class="rl-dot next"></span>Export ESLint/TSlint/*Lint rules and configuration for better integration</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="road-cta">
+      <p>Working on an Obsidian plugin and finding oplint useful?</p>
+      <div class="road-btns">
+        <a class="btn btn-primary" href="https://github.com/kodaskills/oplint" target="_blank" rel="noopener">Star on GitHub</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── FAQ ───────── -->
+  <section class="section" id="faq">
+    <div class="section-head">
+      <span class="eyebrow">FAQ</span>
+      <h2 class="h2">Quick answers 🙋‍♀️.</h2>
+    </div>
+    <div class="faq">
+      <details>
+        <summary>Is oplint affiliated with Obsidian?</summary>
+        <p>No.
+        <p>oplint is a community project from the Kodaskills team that encodes the publicly documented Obsidian plugin guidelines.</p>
+        <p>It is not endorsed by or affiliated with the Obsidian team.</p>
+      </details>
+      <details>
+        <summary>Will it replace the official plugin review?</summary>
+        <p>No — and it's not trying to. </p>
+        <p>oplint catches the mechanical issues so reviewers can focus on the substantive ones (UX, scope, naming, originality).</p>
+        <p>plugins that pass oplint cleanly still need a human review.</p>
+      </details>
+      <details>
+        <summary>What's the difference between <code>exact</code> and <code>approximate</code> rules?</summary>
+        <p><b>Exact</b> rules are semantically precise — no false positives or negatives.</p>
+        <p><b>Approximate</b> rules are best-effort and may misfire on edge cases.</p>
+        <p>You can skip a whole accuracy level in config.</p>
+      </details>
+      <details>
+        <summary>Can I disable a rule for one file?</summary>
+        <p>Yes — per-rule <code>except_in</code> globs in <code>.oplint.yaml</code>, or override severity for a specific rule ID.</p>
+        <p>There's no inline-comment ignore yet; it's on the roadmap.</p>
+      </details>
+      <details>
+        <summary>Does it work on TypeScript or just JavaScript?</summary>
+        <p>Both.</p>
+        <p>tree-sitter parses TypeScript natively, including JSX/TSX. JSON rules run against <code>manifest.json</code>.</p>
+      </details>
+      <details>
+        <summary>How do I write a custom rule?</summary>
+        <p>Add a <code>custom_rules:</code> entry with a tree-sitter query, severity, accuracy and message.</p>
+        <p>The README has a full example with <code>expect: match</code> / <code>not-match</code> semantics.</p>
+      </details>
+      <details>
+        <summary>Any other questions?</summary>
+        <p>Please feel free to discuss!</p>
+        <p><a class="btn btn-outlined" href="https://github.com/kodaskills/oplint/discussions/new?category=q-a" target="_blank" rel="noopener">Open a discussion</a></p>
+      </details>
+    </div>
+  </section>
+
+  <!-- ───────── FOOTER ───────── -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="foot-brand">
+        <span class="brand">
+            <span class="brand-mark">
+                <img src="logo.svg" alt="oplint logo" width="24" height="24" />
+            </span>
+          <span class="brand-name">oplint</span>
+        </span>
+        <p>Static analysis for Obsidian plugin compliance.</p>
+        <p>Maintained by the Kodaskills team.</p>
+        <p>MIT licensed.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h5>Project</h5>
+          <a href="https://github.com/kodaskills/oplint" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://crates.io/crates/oplint" target="_blank" rel="noopener">crates.io</a>
+          <a href="https://github.com/kodaskills/oplint/issues" target="_blank" rel="noopener">Issues</a>
+          <a href="https://github.com/kodaskills/oplint/blob/main/LICENSE" target="_blank" rel="noopener">License</a>
+        </div>
+        <div class="foot-col">
+          <h5>Links</h5>
+          <a href="#rules">Rule catalog</a>
+          <a href="#ci">GitHub Action</a>
+          <a href="#install">Install</a>
+          <a href="https://github.com/kodaskills/oplint" target="_blank" rel="noopener">Source</a>
+        </div>
+        <div class="foot-col">
+          <h5>Support</h5>
+          <a href="https://github.com/sponsors/kodaskills" target="_blank" rel="noopener">Sponsor on GitHub ❤</a>
+          <a href="https://github.com/kodaskills" target="_blank" rel="noopener">Kodaskills</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-fine">
+      <span>© 2026 Kodaskills · MIT</span>
+      <span class="dot" aria-hidden="true">·</span>
+      <span>Not affiliated with Obsidian.md</span>
+    </div>
+  </footer>
+
+</main>
+
+<!-- React for tweaks panel -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="tweaks.jsx"></script>
+
+<script src="landing.js" defer></script>
+</body>
+</html>

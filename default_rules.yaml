@@ -1,0 +1,612 @@
+rules:
+  - id: SEC001
+    name: No innerHTML usage
+    category: Security
+    severity: error
+    message: "Avoid using innerHTML with user-defined input"
+    suggestion: "Use el.createDiv(), createEl() or el.empty() instead"
+    query: '(assignment_expression left: (member_expression property: (property_identifier) @p (#eq? @p "innerHTML")))'
+    accuracy: exact
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#security"
+
+  - id: SEC002
+    name: No outerHTML usage
+    category: Security
+    severity: error
+    message: "Avoid using outerHTML"
+    suggestion: "Use Obsidian DOM API instead"
+    query: '(assignment_expression left: (member_expression property: (property_identifier) @p (#eq? @p "outerHTML")))'
+    accuracy: exact
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#security"
+
+  - id: SEC003
+    name: No insertAdjacentHTML usage
+    category: Security
+    severity: error
+    message: "Avoid using insertAdjacentHTML"
+    suggestion: "Use Obsidian DOM API instead"
+    query: '(call_expression function: (member_expression property: (property_identifier) @p (#eq? @p "insertAdjacentHTML")))'
+    accuracy: exact
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#security"
+
+  - id: SEC004
+    name: No global app instance
+    category: Security
+    severity: warning
+    message: "Avoid using global app or window.app"
+    suggestion: "Use this.app from your plugin instance"
+    query: '(member_expression object: (identifier) @o property: (property_identifier) @p (#eq? @o "window") (#eq? @p "app"))'
+    accuracy: exact
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#general"
+
+  - id: RES001
+    name: Plugin must implement onunload
+    category: Resource
+    severity: error
+    message: "Plugin should clean up resources when unloading"
+    suggestion: "Implement onunload() method to clean up event listeners, intervals, etc."
+    use: check_plugin_onunload
+    accuracy: exact
+    accuracy_note: "Checks that the class extending Plugin declares onunload()."
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#resource-management"
+
+  - id: RES002
+    name: No leaf detachment in onunload
+    category: Resource
+    severity: warning
+    message: "Don't detach leaves in onunload"
+    suggestion: "Let Obsidian handle leaf cleanup automatically"
+    use: check_onunload_detach
+    accuracy: exact
+    accuracy_note: "Detects any .detach() call inside an onunload() method via byte-range containment."
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#resource-management"
+
+  - id: VAULT001
+    name: Prefer vault.process over vault.modify
+    category: Vault
+    severity: warning
+    message: "Use Vault.process instead of Vault.modify for background file operations"
+    suggestion: "Use vault.process() for atomic file modifications"
+    query: '(call_expression function: (member_expression object: (member_expression property: (property_identifier) @v) property: (property_identifier) @m (#eq? @v "vault") (#eq? @m "modify")))'
+    accuracy: exact
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#vault"
+
+  - id: VAULT002
+    name: Filter vault.getFiles results
+    category: Vault
+    severity: warning
+    message: "Avoid iterating all files to find specific files"
+    suggestion: "Use vault.getFileByPath() or filter by extension first"
+    query: '(call_expression function: (member_expression object: (member_expression property: (property_identifier) @v) property: (property_identifier) @m (#eq? @v "vault") (#eq? @m "getFiles")))'
+    accuracy: exact
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#vault"
+
+  - id: VAULT003
+    name: Use normalizePath for user paths
+    category: Vault
+    severity: info
+    message: "Use normalizePath() for user-defined paths"
+    suggestion: "Import normalizePath from obsidian and use it for file/folder paths"
+    query: '(call_expression function: (identifier) @f (#eq? @f "normalizePath"))'
+    accuracy: exact
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#vault"
+
+  - id: WORK001
+    name: Avoid workspace.activeLeaf
+    category: Workspace
+    severity: warning
+    message: "Avoid accessing workspace.activeLeaf directly"
+    suggestion: "Use workspace.getActiveViewOfType() or workspace.activeEditor instead"
+    query: '(member_expression object: (member_expression property: (property_identifier) @w) property: (property_identifier) @l (#eq? @w "workspace") (#eq? @l "activeLeaf"))'
+    accuracy: exact
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#workspace"
+
+  - id: WORK002
+    name: No custom view references
+    category: Workspace
+    severity: warning
+    message: "Don't store references to custom views"
+    suggestion: "Use workspace.getActiveLeavesOfType() to access views"
+    use: check_view_references
+    accuracy: exact
+    accuracy_note: "Matches the exact registerViewType anti-pattern (this.view = new ...)."
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#workspace"
+
+  - id: CMD001
+    name: No default hotkey
+    category: Commands
+    severity: info
+    message: "Avoid setting a default hotkey for commands"
+    suggestion: "Let users configure their own hotkeys"
+    query: '(pair key: (property_identifier) @k (#eq? @k "hotkeys"))'
+    accuracy: exact
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#commands"
+
+  - id: CMD002
+    name: Use appropriate callback type
+    category: Commands
+    severity: warning
+    message: "Use the appropriate callback type for commands"
+    suggestion: "Use callback/editorCallback/checkCallback/editorCheckCallback appropriately"
+    use: check_callback_signature
+    accuracy: exact
+    accuracy_note: "Verifies inline callback signatures against the expected parameter convention. Skips referenced functions to avoid false positives."
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#commands"
+
+  - id: CMD003
+    name: Command ID prefix
+    category: Commands
+    severity: info
+    message: "Command ID should not include plugin ID prefix"
+    suggestion: "Obsidian auto-prefixes command IDs with plugin ID"
+    use: check_command_id_prefix
+    accuracy: exact
+    accuracy_note: "Compares every literal command ID against the plugin ID from manifest.json."
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#commands"
+
+  - id: CMD004
+    name: No command word in command ID
+    category: Commands
+    severity: info
+    message: "Avoid 'command' in command ID — it is redundant"
+    suggestion: "Remove 'command' from the command id field"
+    use: check_command_id_no_command
+    accuracy: exact
+    accuracy_note: "Flags literal command IDs containing 'command'."
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#commands"
+
+  - id: CMD005
+    name: No command word in command name
+    category: Commands
+    severity: info
+    message: "Avoid 'command' in command name"
+    suggestion: "Remove 'command' from the command name — Obsidian uses this term for all commands"
+    use: check_command_name_no_command
+    accuracy: exact
+    accuracy_note: "Flags literal command names containing 'command'."
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#commands"
+
+  - id: CMD006
+    name: No plugin name in command name
+    category: Commands
+    severity: info
+    message: "Avoid including the plugin name in command names"
+    suggestion: "Obsidian auto-prefixes command names with the plugin name"
+    use: check_command_name_prefix
+    accuracy: exact
+    accuracy_note: "Compares every literal command name against the plugin name from manifest.json."
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#commands"
+
+  - id: UI001
+    name: Use setHeading instead of h1/h2
+    category: UI
+    severity: warning
+    message: "Use Setting.setHeading() instead of HTML heading elements"
+    suggestion: "Use new Setting(containerEl).setName('title').setHeading()"
+    query: '(call_expression function: (member_expression property: (property_identifier) @m) arguments: (arguments (string (string_fragment) @t)) (#eq? @m "createEl") (#match? @t "^h[12]$"))'
+    accuracy: exact
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#ui-text"
+
+  - id: UI002
+    name: No settings word in headings
+    category: UI
+    severity: info
+    message: "Avoid 'settings' in settings headings"
+    suggestion: "Use 'Advanced' instead of 'Advanced settings'"
+    use: check_settings_in_setname
+    accuracy: exact
+    accuracy_note: "Checks setName() calls for the word 'settings'."
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#ui-text"
+
+  - id: UI003
+    name: Use sentence case
+    category: UI
+    severity: info
+    message: "Use sentence case in UI text"
+    suggestion: "Prefer 'Create new note' over 'Create New Note'"
+    query: |
+      [
+        (call_expression
+          function: (member_expression
+            property: (property_identifier) @method
+            (#match? @method "^(setName|setDesc|setHeading)$"))
+          arguments: (arguments
+            (string
+              (string_fragment) @text
+              (#match? @text "^[A-Z][a-z]+\\s+[A-Z]"))))
+        (call_expression
+          function: (member_expression
+            property: (property_identifier) @method
+            (#match? @method "^(addCommand|addCommandIf)$"))
+          arguments: (arguments
+            (object
+              (pair
+                key: (property_identifier) @key
+                (#eq? @key "name")
+                value: (string
+                  (string_fragment) @text
+                  (#match? @text "^[A-Z][a-z]+\\s+[A-Z]"))))))
+      ]
+    accuracy: approximate
+    accuracy_note: "Heuristic detection of Title Case; may flag proper nouns or acronyms. Manual review advised."
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#ui-text"
+
+  - id: UI004
+    name: No top-level heading in settings
+    category: UI
+    severity: warning
+    message: "Avoid redundant top-level headings in single-section settings tabs"
+    suggestion: "Remove headings like 'General' or 'Settings' when there is only one section"
+    use: check_redundant_heading
+    accuracy: approximate
+    accuracy_note: "Flags a small set of common redundant heading strings. Cannot detect the actual number of settings sections. Manual review advised."
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#ui-text"
+
+  - id: UI005
+    name: No manual HTML headings in settings
+    category: UI
+    severity: warning
+    message: "Avoid createEl() for h3-h6 heading elements in settings"
+    suggestion: "Use new Setting(containerEl).setName('title').setHeading() instead"
+    query: '(call_expression function: (member_expression property: (property_identifier) @m) arguments: (arguments (string (string_fragment) @t)) (#eq? @m "createEl") (#match? @t "^h[3-6]$"))'
+    accuracy: exact
+    accuracy_note: "Flags createEl() calls with literal h3-h6 strings."
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#ui-text"
+
+  - id: STYLE001
+    name: No hardcoded styling
+    category: Styling
+    severity: warning
+    message: "Avoid hardcoded styles in JavaScript"
+    suggestion: "Use CSS classes and CSS variables instead"
+    query: '(assignment_expression left: (member_expression object: (member_expression property: (property_identifier) @s)) (#eq? @s "style"))'
+    accuracy: exact
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines"
+
+  - id: TS001
+    name: Prefer const/let over var
+    category: TypeScript
+    severity: info
+    message: "Use const or let instead of var"
+    suggestion: "Use const or let for block-scoped variables"
+    query: "(variable_declaration) @decl"
+    accuracy: exact
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#typescript"
+
+  - id: TS002
+    name: Avoid unnecessary Promise wrapper
+    category: TypeScript
+    severity: warning
+    message: "Promise constructor may be unnecessary when resolve/reject are passed as callbacks"
+    suggestion: "Consider if the Promise wrapper is needed, or if you can use the callback-based API directly"
+    use: check_promise_async_await
+    accuracy: exact
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#typescript"
+
+  - id: GEN001
+    name: No unnecessary console logging
+    category: General
+    severity: warning
+    message: "Avoid console.log() — only errors should appear in the developer console"
+    suggestion: "Remove console.log() or replace with console.error() inside catch blocks"
+    query: '(call_expression function: (member_expression object: (identifier) @o property: (property_identifier) @p (#eq? @o "console") (#eq? @p "log")))'
+    accuracy: exact
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#general"
+
+  - id: GEN002
+    name: Rename placeholder class names
+    category: General
+    severity: error
+    message: "Placeholder class name detected — rename before publishing"
+    suggestion: "Rename MyPlugin, MyPluginSettings, SampleSettingTab to match your plugin name"
+    query: '(class_declaration name: (type_identifier) @n (#match? @n "^(MyPlugin|MyPluginSettings|SampleSettingTab)$"))'
+    accuracy: exact
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#general"
+
+  - id: GEN003
+    name: Avoid bare global app instance
+    category: General
+    severity: warning
+    message: "Avoid using the bare global app variable"
+    suggestion: "Use this.app from your plugin instance"
+    use: check_global_app
+    accuracy: approximate
+    accuracy_note: "Cannot distinguish between the global Obsidian `app` and a local variable named app passed by parameter."
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#general"
+
+  - id: API001
+    name: Prefer Vault API over Adapter API
+    category: Vault
+    severity: warning
+    message: "Avoid using vault.adapter directly"
+    suggestion: "Use Vault API methods instead of vault.adapter"
+    query: '(member_expression object: (member_expression property: (property_identifier) @v) property: (property_identifier) @a (#eq? @v "vault") (#eq? @a "adapter"))'
+    accuracy: exact
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#vault"
+
+  - id: API002
+    name: Prefer FileManager.trashFile
+    category: Vault
+    severity: warning
+    message: "Use FileManager.trashFile() instead of vault.trash() or vault.delete()"
+    suggestion: "Use this.app.fileManager.trashFile() to respect user trash preferences"
+    query: '(call_expression function: (member_expression object: (member_expression property: (property_identifier) @v) property: (property_identifier) @m (#eq? @v "vault") (#match? @m "^(trash|delete)$")))'
+    accuracy: exact
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#vault"
+
+  - id: API003
+    name: No TFile/TFolder type casting
+    category: TypeScript
+    severity: warning
+    message: "Avoid casting to TFile or TFolder with as"
+    suggestion: "Use instanceof TFile or instanceof TFolder for type narrowing"
+    query: '(as_expression (type_identifier) @t (#match? @t "^(TFile|TFolder)$"))'
+    accuracy: exact
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#typescript"
+
+  - id: API004
+    name: Prefer instanceOf for DOM/UIEvent checks
+    category: TypeScript
+    severity: warning
+    message: "Prefer el.instanceOf() over instanceof for DOM nodes and UIEvents in cross-window contexts"
+    suggestion: "Use el.instanceOf(HTMLElement) for cross-window compatibility"
+    use: check_instanceof_dom
+    accuracy: exact
+    accuracy_note: "Checks instanceof against a closed list of known DOM/UIEvent constructors."
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#typescript"
+
+  - id: API005
+    name: No plugin as MarkdownRenderer component
+    category: Resource
+    severity: error
+    message: "Do not pass the plugin instance as the component argument to MarkdownRenderer.render()"
+    suggestion: "Pass a dedicated HTMLElement as the component to avoid memory leaks"
+    use: check_markdown_renderer_component
+    accuracy: exact
+    accuracy_note: "Detects MarkdownRenderer.render(content, this) literally."
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#resource-management"
+
+  - id: API006
+    name: Prefer AbstractInputSuggest
+    category: UI
+    severity: warning
+    message: "Use AbstractInputSuggest instead of a custom TextInputSuggest implementation"
+    suggestion: "Extend AbstractInputSuggest from obsidian"
+    use: check_popover_suggest_usage
+    accuracy: exact
+    accuracy_note: "Detects classes that literally extend PopoverSuggest."
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#ui-text"
+
+  - id: API007
+    name: Prefer getLanguage for locale detection
+    category: UI
+    severity: warning
+    message: "Use getLanguage() instead of localStorage.getItem('language')"
+    suggestion: "Import getLanguage from obsidian"
+    query: '(call_expression function: (member_expression object: (identifier) @o property: (property_identifier) @p) arguments: (arguments (string (string_fragment) @s)) (#eq? @o "localStorage") (#eq? @p "getItem") (#eq? @s "language"))'
+    accuracy: exact
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#ui-text"
+
+  - id: MAN001
+    name: Required manifest field - id
+    category: Manifest
+    severity: error
+    message: "manifest.json missing required field: id"
+    suggestion: 'Add "id" field to manifest.json'
+    query: '(document (object (pair key: (string (string_content) @k) (#eq? @k "id"))))'
+    accuracy: exact
+    expect: no-match
+    applies_to: manifest
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#manifest"
+
+  - id: MAN002
+    name: Required manifest field - name
+    category: Manifest
+    severity: error
+    message: "manifest.json missing required field: name"
+    suggestion: 'Add "name" field to manifest.json'
+    query: '(document (object (pair key: (string (string_content) @k) (#eq? @k "name"))))'
+    accuracy: exact
+    expect: no-match
+    applies_to: manifest
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#manifest"
+
+  - id: MAN003
+    name: Required manifest field - version
+    category: Manifest
+    severity: error
+    message: "manifest.json missing required field: version"
+    suggestion: 'Add "version" field to manifest.json'
+    query: '(document (object (pair key: (string (string_content) @k) (#eq? @k "version"))))'
+    accuracy: exact
+    expect: no-match
+    applies_to: manifest
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#manifest"
+
+  - id: MAN004
+    name: Required manifest field - minAppVersion
+    category: Manifest
+    severity: error
+    message: "manifest.json missing required field: minAppVersion"
+    suggestion: 'Add "minAppVersion" field to manifest.json'
+    query: '(document (object (pair key: (string (string_content) @k) (#eq? @k "minAppVersion"))))'
+    accuracy: exact
+    expect: no-match
+    applies_to: manifest
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#manifest"
+
+  - id: MAN005
+    name: Required manifest field - description
+    category: Manifest
+    severity: error
+    message: "manifest.json missing required field: description"
+    suggestion: 'Add "description" field to manifest.json'
+    query: '(document (object (pair key: (string (string_content) @k) (#eq? @k "description"))))'
+    accuracy: exact
+    expect: no-match
+    applies_to: manifest
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#manifest"
+
+  - id: MAN006
+    name: Required manifest field - author
+    category: Manifest
+    severity: error
+    message: "manifest.json missing required field: author"
+    suggestion: 'Add "author" field to manifest.json'
+    query: '(document (object (pair key: (string (string_content) @k) (#eq? @k "author"))))'
+    accuracy: exact
+    expect: no-match
+    applies_to: manifest
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#manifest"
+
+  - id: MAN007
+    name: Valid plugin ID format
+    category: Manifest
+    severity: error
+    message: "Plugin ID must be lowercase alphanumeric with hyphens"
+    suggestion: "Use only lowercase letters, digits, and hyphens (e.g. my-plugin)"
+    query: '(document (object (pair key: (string (string_content) @k) value: (string (string_content) @v) (#eq? @k "id") (#match? @v "^[a-z0-9][a-z0-9-]*[a-z0-9]$"))))'
+    accuracy: exact
+    expect: no-match
+    applies_to: manifest
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#manifest"
+
+  - id: MAN008
+    name: DesktopOnly for Node.js APIs
+    category: Manifest
+    severity: warning
+    message: "Set isDesktopOnly if using Node.js or Electron APIs"
+    suggestion: 'Add "isDesktopOnly": true to manifest.json'
+    use: check_node_desktop_only
+    accuracy: approximate
+    accuracy_note: "Scans for Node.js imports; cannot detect all dynamic or electron-only APIs."
+    expect: no-match
+    applies_to: manifest
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#manifest"
+
+  - id: MAN009
+    name: Description length
+    category: Manifest
+    severity: info
+    message: "Description should be 250 characters or less"
+    suggestion: "Keep description concise"
+    query: '(document (object (pair key: (string (string_content) @k) value: (string (string_content) @v) (#eq? @k "description") (#match? @v "^.{251}"))))'
+    accuracy: exact
+    expect: match
+    applies_to: manifest
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#manifest"
+
+  - id: MAN010
+    name: Description ending period
+    category: Manifest
+    severity: info
+    message: "Description should end with a period"
+    suggestion: "End description with a period"
+    query: '(document (object (pair key: (string (string_content) @k) value: (string (string_content) @v) (#eq? @k "description") (#match? @v "\.$"))))'
+    accuracy: exact
+    expect: no-match
+    applies_to: manifest
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#manifest"
+
+  - id: MAN011
+    name: No sample plugin ID
+    category: Manifest
+    severity: error
+    message: "Plugin ID appears to be an unchanged sample value"
+    suggestion: "Set a unique plugin ID before publishing"
+    query: '(document (object (pair key: (string (string_content) @k) value: (string (string_content) @v) (#eq? @k "id") (#match? @v "^(sample-plugin|my-plugin|obsidian-sample-plugin)$"))))'
+    accuracy: exact
+    expect: match
+    applies_to: manifest
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#manifest"
+
+  - id: MAN012
+    name: Validate license file
+    category: Manifest
+    severity: warning
+    message: "LICENSE file should contain a valid copyright notice"
+    suggestion: "Ensure the LICENSE file includes a copyright notice with author name and year"
+    use: validate_license_copyright
+    accuracy: approximate
+    accuracy_note: "Uses a regex inside the custom checker. Cannot verify that the author name matches the manifest or that the year is correct. A full semantic validation would cross‑reference manifest.json fields."
+    applies_to: license
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#manifest"
+
+  - id: MOB001
+    name: No regex lookbehind
+    category: Mobile
+    severity: warning
+    message: "Avoid regex lookbehind assertions — not supported on some iOS versions"
+    suggestion: "Use a regular expression without lookbehind, or capture groups instead"
+    use: check_regex_lookbehind
+    accuracy: exact
+    accuracy_note: "Detects lookbehind assertions in regex literals and RegExp constructor calls. Cannot check dynamically constructed patterns."
+    skip_if_desktop_only: true
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#mobile"
+
+  - id: MOB002
+    name: Prefer activeWindow timers
+    category: Mobile
+    severity: warning
+    message: "Use activeWindow.setTimeout() instead of global setTimeout()"
+    suggestion: "Import activeWindow from obsidian and use activeWindow.setTimeout()"
+    use: check_global_timers
+    accuracy: exact
+    accuracy_note: "Flags bare setTimeout()/setInterval() calls. Aliased or dynamically referenced functions are not checked."
+    skip_if_desktop_only: true
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#mobile"
+
+  - id: MOB003
+    name: Prefer activeDocument/activeWindow
+    category: Mobile
+    severity: warning
+    message: "Use activeDocument/activeWindow instead of document/window for popout compatibility"
+    suggestion: "Import activeDocument and activeWindow from obsidian"
+    use: check_global_document_window
+    accuracy: exact
+    accuracy_note: "Flags bare `document` and `window` identifiers (not as property names). Aliased variables are not detected."
+    skip_if_desktop_only: true
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#mobile"
+
+  - id: MOB004
+    name: No navigator API for platform detection
+    category: Mobile
+    severity: warning
+    message: "Avoid using the navigator API for platform detection"
+    suggestion: "Use Platform from obsidian (Platform.isMobile, Platform.isDesktop)"
+    use: check_navigator_usage
+    accuracy: exact
+    accuracy_note: "Flags any member expression on the literal `navigator` identifier."
+    skip_if_desktop_only: true
+    expect: match
+    reference: "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines#mobile"

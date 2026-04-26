@@ -1,0 +1,74 @@
+name: ⚠️ Rule Feedback
+description: Report a false positive, false negative, or unexpected rule behavior
+title: 'rule: [RULE_ID] '
+labels: ["rule-feedback"]
+body:
+  - type: input
+    id: rule-id
+    attributes:
+      label: Rule ID
+      placeholder: e.g., SEC001, MOB003
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: behavior-type
+    attributes:
+      label: Behavior Type
+      options:
+        - label: False positive — rule fires but shouldn't
+        - label: False negative — rule should fire but doesn't
+        - label: Wrong severity or message
+        - label: Other unexpected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: plugin-code
+    attributes:
+      label: Plugin Code That Triggers the Issue
+      description: Minimal snippet that reproduces the problem. Remove any sensitive data.
+      render: typescript
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: What the rule should do with this code.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual Behavior
+      description: What the rule actually does — include the violation message if applicable.
+    validations:
+      required: true
+
+  - type: input
+    id: oplint-version
+    attributes:
+      label: oplint Version
+      description: Run `oplint --version`
+      placeholder: e.g., 0.18
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      placeholder: e.g., macOS 14, Ubuntu 22.04, Windows 11
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Link to Obsidian docs, API reference, or plugin review guideline that supports your expectation.
+    validations:
+      required: false

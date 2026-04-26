@@ -1,0 +1,34 @@
+# Obsidian Plugin Linter Configuration
+# https://github.com/kodaskills/oplint
+
+# File exclusions
+exclude:
+  use_gitignore: true # respect .gitignore (default: true)
+  patterns: [] # gitignore-style patterns, e.g.:
+  #   - node_modules
+  #   - dist/
+  #   - coverage/
+  #   - "**/*.generated.ts"
+
+# Rules configuration
+rules:
+  enabled: all # or list specific rule IDs: [SEC001, SEC002]
+  disabled: [] # list of rule IDs to disable
+  skip_accuracy: [] # skip rules by accuracy: [approximate] [exact]
+
+# Override severity for specific rules
+SEC001:
+  severity: error # error|warning|info
+
+
+# Custom rules (optional)
+# custom_rules:
+#   - id: CUSTOM001
+#     name: No TODO in production
+#     category: Quality
+#     severity: error
+#     message: "TODO found in production code"
+#     query: "\\bTODO\\b"
+#     path_filter: "**/*.ts"
+#     except_in:
+#       - "**/tests/**"

@@ -1,0 +1,56 @@
+[package]
+name = "oplint"
+version = "0.1.0"
+edition = "2021"
+authors = ["Kodaskills"]
+description = "CLI tool to check Obsidian plugin compliance with (un)official guidelines"
+license = "MIT"
+repository = "https://github.com/kodaskills/oplint"
+keywords = ["obsidian", "plugin", "linter", "cli"]
+rust-version = "1.70"
+
+[dependencies]
+clap = { version = "4.4", features = ["derive", "cargo"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", optional = true }
+serde_yaml = { version = "0.9", optional = true }
+toml = { version = "1.1.2", optional = true }
+glob = "0.3"
+ignore = "0.4"
+colored = { version = "3.1.1", optional = true }
+termcolor = "1.4"
+thiserror = "2.0"
+walkdir = "2.5"
+anyhow = "1.0"
+rayon = "1.10"
+askama = { version = "0.16.0", optional = true }
+tabled = { version = "0.20", features = ["ansi"], optional = true }
+tree-sitter = { version = "0.26.8", optional = true }
+tree-sitter-typescript = { version = "0.23", optional = true }
+tree-sitter-json = { version = "0.24", optional = true }
+indicatif = { version = "0.18.0", features = ["rayon"] }
+
+[dev-dependencies]
+tempfile = "3.27"
+assert_cmd = "2.0"
+
+[features]
+default = ["std", "fmt-json", "fmt-yaml", "fmt-toml", "fmt-html", "fmt-markdown", "fmt-table", "fmt-terminal"]
+std = ["dep:serde_json", "dep:serde_yaml", "dep:toml", "fmt-terminal",
+       "dep:tree-sitter", "dep:tree-sitter-typescript", "dep:tree-sitter-json"]
+fmt-json = ["dep:serde_json"]
+fmt-yaml = ["dep:serde_yaml"]
+fmt-toml = ["dep:toml"]
+fmt-html = ["dep:askama"]
+fmt-markdown = ["dep:askama"]
+fmt-table = ["dep:tabled", "dep:colored"]
+fmt-terminal = ["dep:colored"]
+
+[[bin]]
+name = "oplint"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
