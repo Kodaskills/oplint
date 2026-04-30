@@ -3,7 +3,11 @@ set -e
 
 REPO="Kodaskills/oplint"
 BIN="oplint"
-RELEASES="https://github.com/${REPO}/releases/latest/download"
+if [ -n "${VERSION:-}" ]; then
+  RELEASES="https://github.com/${REPO}/releases/download/v${VERSION}"
+else
+  RELEASES="https://github.com/${REPO}/releases/latest/download"
+fi
 
 # ── Detect OS ────────────────────────────────────────────────────────────────
 os=$(uname -s)
