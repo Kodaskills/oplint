@@ -197,7 +197,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
    <section class="section" id="why">
      <div class="section-head">
        <span class="eyebrow">Why oplint</span>
-       <h2 class="h2">The Obsidian guidelines are <em>strong</em> 💪.<br>Your workflow should be fast ⚡!</h2>
+       <h2 class="h2">The Obsidian guidelines are <em>strong</em> 💪.<br>Your workflow should be secure 🔒!</h2>
      </div>
 
      <div class="why-grid">
@@ -229,11 +229,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
          <h3>Style guidelines are<span class="word-highlight wh-subtle">subtle</span></h3>
          <p>Sentence case, no top-level settings headings, <code>setHeading()</code> over <code>h1</code>, no inline <code>style=</code> attributes. The kind of thing a reviewer notices and a linter should catch.</p>
        </article>
-       <article class="why-card">
-         <div class="why-num">06 TOKENS</div>
-         <h3>AI loops are <span class="word-highlight wh-costly">costly</span></h3>
-         <p>Every rejected submission means another AI prompt to fix the same issue. oplint catches the mechanical problems before you submit — so your agent spends tokens on the interesting work, not on the same 12 checklist items.</p>
-       </article>
+      <article class="why-card why-card-smart">
+        <div class="why-header">
+          <div class="why-num">06 TOKENS</div>
+          <div class="why-badge-smart">Stay Clever</div>
+        </div>
+        <h3>AI loops are <span class="word-highlight wh-costly">costly</span></h3>
+        <p>Every loop verifying you stick to guidelines means another AI prompt to fix the same issues. oplint automates this — keeping your plugin performant and your users' Obsidian stable, so your agent spends tokens on interesting work, not the same 12 checklist items.</p>
+      </article>
      </div>
    </section>
 
@@ -370,7 +373,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="how-num">C</div>
         <h3>Won't choose?</h3>
         <pre class="snippet"><code><span class="tok-c"># render any reports you need</span>
-<span class="tok-p">$</span> cargo run lint -f html,tom,yaml,json,table -o ./reporting</code><button class="copy-btn" aria-label="Copy to clipboard" data-copy="cargo run lint -f html,tom,yaml,json,table -o ./reporting"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></pre>
+<span class="tok-p">$</span> cargo run lint -f html,md,tom,yaml,json,table -o ./reporting</code><button class="copy-btn" aria-label="Copy to clipboard" data-copy="cargo run lint -f html,tom,yaml,json,table -o ./reporting"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></pre>
       </li>
       <li>
         <div class="how-num">D</div>
@@ -410,7 +413,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="rules-cta">
       <p>You have encountered a rule that doesn't fit your use case? You want to add a new guideline rule for the good of the community?</p>
       <div class="rules-btns">
-        <a class="btn btn-outlined" href="https://github.com/kodaskills/oplint/issues/new?template=feature_request" target="_blank" rel="noopener">Open an issue</a>
+        <a class="btn btn-outlined" href="https://github.com/Kodaskills/oplint/issues/new?template=feature_request.yml" target="_blank" rel="noopener">Open an issue</a>
       </div>
     </div>
   </section>

@@ -246,7 +246,7 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
 .stat:last-child { padding-right: 0; }
 .stat + .stat { border-left: 1px solid var(--line); }
 .stat-n {
-  font-size: 34px; font-weight: 800; letter-spacing: -0.04em;
+  font-size: 28px; font-weight: 800; letter-spacing: -0.04em;
   font-variant-numeric: tabular-nums;
   line-height: 1;
   margin-bottom: 6px;
@@ -485,7 +485,49 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
 .why-card-impact .why-num {
   color: var(--err);
   font-weight: 700;
-  margin-bottom: 0;
+  margin-bottom:0;
+}
+
+/* Smart card - intelligent approach */
+.why-card-smart {
+  border-color: var(--info);
+  background: linear-gradient(135deg, var(--bg-1) 0%, oklch(0.72 0.11 230 / 0.08) 100%);
+  box-shadow: 0 0 0 1px var(--info), 0 4px 20px oklch(0.72 0.11 230 / 0.15);
+}
+.why-card-smart::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, oklch(0.72 0.11 230 / 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+.why-card-smart .why-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.why-card-smart .why-badge-smart {
+  display: inline-block;
+  padding: 3px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: white;
+  background: var(--info);
+  border-radius: 4px;
+  animation: pulse-badge-smart 2s ease-in-out infinite;
+}
+@keyframes pulse-badge-smart {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+.why-card-smart .why-num {
+  color: var(--info);
+  font-weight: 700;
+  margin-bottom:0;
 }
 
 /* word highlights on card hover */

@@ -116,7 +116,7 @@ For the full rule reference (IDs, descriptions, severities, accuracy levels), se
 
 > **Rules are battle-tested against a wide range of real-world plugins**, but static analysis is never perfect.
 > If you hit a false positive, a missed violation, or any unexpected behavior, please kindly
-> [open a Rule Feedback issue](https://github.com/kodaskills/oplint/issues/new?template=rule_feedback.md) —
+> [open a Rule Feedback issue](https://github.com/Kodaskills/oplint/issues/new?template=rule_feedback.yml) —
 > it helps improve accuracy for everyone.
 
 ---
