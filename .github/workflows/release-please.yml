@@ -56,7 +56,7 @@ jobs:
             artifact: oplint-windows-x86_64.zip
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || needs.release-please.outputs.tag_name }}
 
@@ -108,7 +108,7 @@ jobs:
       !contains(needs.release-please.outputs.tag_name, '-')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || needs.release-please.outputs.tag_name }}
 
