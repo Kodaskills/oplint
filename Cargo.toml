@@ -1,6 +1,6 @@
 [package]
 name = "oplint"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 authors = ["Kodaskills"]
 description = "CLI tool to check Obsidian plugin compliance with (un)official guidelines"
