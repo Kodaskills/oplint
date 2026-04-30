@@ -30,7 +30,10 @@ case "$arch" in
 esac
 
 # ── Resolve install dir ───────────────────────────────────────────────────────
-if [ -w /usr/local/bin ]; then
+if [ -n "${INSTALL_DIR:-}" ]; then
+  install_dir="$INSTALL_DIR"
+  mkdir -p "$install_dir"
+elif [ -w /usr/local/bin ]; then
   install_dir="/usr/local/bin"
 elif [ -d "$HOME/.local/bin" ]; then
   install_dir="$HOME/.local/bin"
@@ -42,17 +45,40 @@ fi
 # ── Download & install ────────────────────────────────────────────────────────
 artifact="${BIN}-${os_name}-${arch_name}.tar.gz"
 url="${RELEASES}/${artifact}"
+checksum_url="${RELEASES}/${artifact}.sha256"
 tmp=$(mktemp -d)
 
+download() {
+  if command -v curl > /dev/null 2>&1; then
+    curl -fsSL "$1" -o "$2"
+  elif command -v wget > /dev/null 2>&1; then
+    wget -q "$1" -O "$2"
+  else
+    echo "curl or wget required"
+    exit 1
+  fi
+}
+
 echo "Downloading ${artifact}..."
-if command -v curl > /dev/null 2>&1; then
-  curl -fsSL "$url" -o "${tmp}/${artifact}"
-elif command -v wget > /dev/null 2>&1; then
-  wget -q "$url" -O "${tmp}/${artifact}"
+download "$url" "${tmp}/${artifact}"
+download "$checksum_url" "${tmp}/${artifact}.sha256"
+
+echo "Verifying checksum..."
+expected=$(cat "${tmp}/${artifact}.sha256" | awk '{print $1}')
+if command -v sha256sum > /dev/null 2>&1; then
+  actual=$(sha256sum "${tmp}/${artifact}" | awk '{print $1}')
+elif command -v shasum > /dev/null 2>&1; then
+  actual=$(shasum -a 256 "${tmp}/${artifact}" | awk '{print $1}')
 else
-  echo "curl or wget required"
+  echo "Warning: sha256sum/shasum not found, skipping checksum verification"
+  actual="$expected"
+fi
+if [ "$actual" != "$expected" ]; then
+  echo "Checksum mismatch! Expected: $expected  Got: $actual"
+  rm -rf "$tmp"
   exit 1
 fi
+echo "Checksum OK"
 
 tar -xzf "${tmp}/${artifact}" -C "$tmp"
 install -m 755 "${tmp}/${BIN}" "${install_dir}/${BIN}"

@@ -85,18 +85,25 @@ jobs:
 
       - name: Package (Unix)
         if: runner.os != 'Windows'
-        run: tar -czf ${{ matrix.artifact }} -C target/${{ matrix.target }}/release oplint
+        run: |
+          tar -czf ${{ matrix.artifact }} -C target/${{ matrix.target }}/release oplint
+          sha256sum ${{ matrix.artifact }} > ${{ matrix.artifact }}.sha256
 
       - name: Package (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
-        run: Compress-Archive -Path target/${{ matrix.target }}/release/oplint.exe -DestinationPath ${{ matrix.artifact }}
+        run: |
+          Compress-Archive -Path target/${{ matrix.target }}/release/oplint.exe -DestinationPath ${{ matrix.artifact }}
+          $hash = (Get-FileHash ${{ matrix.artifact }} -Algorithm SHA256).Hash.ToLower()
+          "$hash  ${{ matrix.artifact }}" | Out-File -FilePath "${{ matrix.artifact }}.sha256" -Encoding ASCII
 
       - name: Upload to release
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || needs.release-please.outputs.tag_name }}
-          files: ${{ matrix.artifact }}
+          files: |
+            ${{ matrix.artifact }}
+            ${{ matrix.artifact }}.sha256
 
   # ── Publish to crates.io after a release is created ───────────────────────
   crates-io:
