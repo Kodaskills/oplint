@@ -94,16 +94,12 @@ fn formal_params_has_app(params_node: &Node<'_>, content_bytes: &[u8]) -> bool {
     for child in params_node.children(&mut cursor) {
         match child.kind() {
             // Plain JS: function foo(app) {}
-            "identifier" => {
-                if child.utf8_text(content_bytes).ok() == Some("app") {
-                    return true;
-                }
+            "identifier" if child.utf8_text(content_bytes).ok() == Some("app") => {
+                return true;
             }
             // TypeScript: function foo(app: App) {} or constructor(private app: App)
-            "required_parameter" | "optional_parameter" => {
-                if param_is_app(&child, content_bytes) {
-                    return true;
-                }
+            "required_parameter" | "optional_parameter" if param_is_app(&child, content_bytes) => {
+                return true;
             }
             _ => {}
         }
@@ -211,15 +207,13 @@ fn formal_params_has_name(params_node: &Node<'_>, name: &str, content_bytes: &[u
     let mut cursor = params_node.walk();
     for child in params_node.children(&mut cursor) {
         match child.kind() {
-            "identifier" => {
-                if child.utf8_text(content_bytes).ok() == Some(name) {
-                    return true;
-                }
+            "identifier" if child.utf8_text(content_bytes).ok() == Some(name) => {
+                return true;
             }
-            "required_parameter" | "optional_parameter" => {
-                if param_has_name(&child, name, content_bytes) {
-                    return true;
-                }
+            "required_parameter" | "optional_parameter"
+                if param_has_name(&child, name, content_bytes) =>
+            {
+                return true;
             }
             _ => {}
         }
