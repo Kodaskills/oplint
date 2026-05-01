@@ -1,0 +1,29 @@
+name: "oplint-live"
+
+services:
+  dev:
+    build:
+      context: .
+      target: dev
+    image: oplint-live-dev
+    container_name: dev
+    ports: ["8080:8080"]
+    volumes:
+      - ./server:/app # live source code
+      - cargo-target:/app/target # persist compiled dependencies (speeds up rebuilds)
+    stdin_open: true
+    tty: true
+    command: cargo watch -x run
+
+  prod:
+    build:
+      context: .
+      target: prod
+    image: oplint-live
+    container_name: prod
+    ports: ["8080:8080"]
+    restart: unless-stopped
+    # No volumes – production image is immutable and self-contained
+
+volumes:
+  cargo-target: # named volume definition

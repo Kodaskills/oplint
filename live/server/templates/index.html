@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>oplint live — Online Demo</title>
+  <meta name="description" content="Check any Obsidian plugin for compliance — right from your browser.">
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-TSSQ2HZX');</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+
+  <style>
+    /* ── tokens (matching docs) ── */
+    :root {
+      --bg:          #0a0b10;
+      --bg-1:        #0f1117;
+      --bg-2:        #161922;
+      --bg-3:        #1f232e;
+      --line:        #232734;
+      --line-2:      #313747;
+      --fg:          #ece8e0;
+      --fg-1:        #b6b3aa;
+      --fg-2:        #82807a;
+      --fg-3:        #4f4d47;
+      --accent:      oklch(0.72 0.16 295);
+      --accent-2:    oklch(0.78 0.13 320);
+      --accent-soft: oklch(0.72 0.16 295 / 0.14);
+      --accent-line: oklch(0.72 0.16 295 / 0.36);
+      --err:         oklch(0.68 0.18 25);
+      --warn:        oklch(0.78 0.14 75);
+      --pass:        oklch(0.74 0.13 155);
+    }
+    /* fallback for browsers without oklch */
+    @supports not (color: oklch(0 0 0)) {
+      :root {
+        --accent:      #7c6fe0;
+        --accent-2:    #a78bfa;
+        --accent-soft: rgba(124,111,224,0.14);
+        --accent-line: rgba(124,111,224,0.36);
+        --err:         #ef4444;
+        --warn:        #fbbf24;
+        --pass:        #10b981;
+      }
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      font-size: 15px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    code, pre { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-ligatures: none; }
+
+    /* hljs: remove background so our pre styling wins */
+    .hljs { background: transparent !important; padding: 0 !important; }
+
+    /* ── animated background ── */
+    .bg-grid {
+      position: fixed; inset: 0; z-index: -2;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: 56px 56px;
+      background-position: -1px -1px;
+      mask-image: radial-gradient(ellipse 80% 50% at 50% 0%, black 30%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse 80% 50% at 50% 0%, black 30%, transparent 70%);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .bg-glow {
+      position: fixed; inset: 0; z-index: -1;
+      pointer-events: none;
+      background:
+        radial-gradient(800px 500px at 15% 10%, oklch(0.55 0.18 295 / 0.18), transparent 60%),
+        radial-gradient(700px 500px at 85% 5%,  oklch(0.55 0.16 320 / 0.14), transparent 60%);
+      animation: glow-shift 18s ease-in-out infinite alternate;
+    }
+    @supports not (color: oklch(0 0 0)) {
+      .bg-glow {
+        background:
+          radial-gradient(800px 500px at 15% 10%, rgba(100,80,200,0.14), transparent 60%),
+          radial-gradient(700px 500px at 85% 5%,  rgba(150,80,200,0.10), transparent 60%);
+      }
+    }
+    @keyframes glow-shift {
+      0%   { transform: translate(0,0) scale(1); }
+      100% { transform: translate(-3%,2%) scale(1.05); }
+    }
+
+    /* ── nav ── */
+    .nav {
+      position: sticky; top: 0; z-index: 60;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background: rgba(10,11,16,0.82);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-inner {
+      max-width: 1400px; margin: 0 auto;
+      padding: 11px 24px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .brand {
+      display: inline-flex; align-items: center; gap: 8px;
+      text-decoration: none; color: var(--fg);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700; font-size: 15px; letter-spacing: -0.01em;
+    }
+    .brand svg { color: var(--accent); }
+    .nav-actions { margin-left: auto; }
+    .nav-gh {
+      display: inline-flex; align-items: center; gap: 6px;
+      height: 30px; padding: 0 12px;
+      background: var(--bg-2); border: 1px solid var(--line);
+      color: var(--fg-1); border-radius: 7px;
+      font: inherit; font-size: 12.5px; font-weight: 500;
+      text-decoration: none; cursor: pointer;
+      transition: background .12s, color .12s, border-color .12s;
+    }
+    .nav-gh:hover { background: var(--bg-3); color: var(--fg); border-color: var(--line-2); }
+
+    /* ── buttons ── */
+    .btn-run {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; height: 44px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      border: none; border-radius: 10px;
+      font: inherit; font-size: 15px; font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 6px 20px -8px var(--accent);
+      transition: transform .12s, box-shadow .12s, opacity .12s;
+    }
+    .btn-run:hover { transform: translateY(-1px); box-shadow: 0 10px 28px -8px var(--accent); }
+    .btn-run:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-sm {
+      display: inline-flex; align-items: center; gap: 4px;
+      height: 26px; padding: 0 9px;
+      background: var(--bg-3); border: 1px solid var(--line-2);
+      color: var(--fg-1); border-radius: 6px;
+      font: inherit; font-size: 11.5px; font-weight: 500;
+      cursor: pointer;
+      transition: background .12s, color .12s;
+    }
+    .btn-sm:hover { background: var(--line-2); color: var(--fg); }
+    .btn-sm.copied { color: var(--pass); border-color: var(--pass); }
+
+    /* ── spinner ── */
+    .spinner {
+      display: none;
+      width: 15px; height: 15px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── layout ── */
+    .container { max-width: 1400px; margin: 0 auto; padding: 0 1.5rem 4rem; }
+    .page-header { text-align: center; padding: 2.5rem 0 2rem; }
+    .page-header h1 {
+      font-size: clamp(26px, 4vw, 40px);
+      font-weight: 700; letter-spacing: -0.03em;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.4rem;
+    }
+    .page-header p { color: var(--fg-1); font-size: 15px; }
+    .page-header p + p { font-size: 15px; color: var(--fg-2); margin-top: 0.5rem; }
+    .page-header a { color: var(--accent); text-decoration: none; }
+    .page-header a:hover { text-decoration: underline; }
+    .disclaimer {
+      display: inline-flex; align-items: flex-start; gap: 10px;
+      margin-top: 1.25rem;
+      padding: 12px 18px;
+      background: oklch(0.78 0.14 75 / 0.08);
+      border: 1px solid oklch(0.78 0.14 75 / 0.28);
+      border-radius: 12px;
+      font-size: 13px; color: var(--fg-2);
+      text-align: left; line-height: 1.55;
+      max-width: 640px;
+    }
+    @supports not (color: oklch(0 0 0)) {
+      .disclaimer {
+        background: rgba(251,191,36,0.08);
+        border-color: rgba(251,191,36,0.28);
+      }
+    }
+    .disclaimer-icon {
+      font-size: 16px; line-height: 1; flex-shrink: 0; margin-top: 1px;
+    }
+    .disclaimer strong { color: var(--warn); font-weight: 600; }
+    .disclaimer a { color: var(--fg-1); text-decoration: underline; text-decoration-color: var(--line-2); }
+    .disclaimer a:hover { color: var(--fg); }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 380px minmax(0, 1fr);
+      gap: 1.5rem;
+      align-items: start;
+    }
+    .left-column {
+      display: flex; flex-direction: column; gap: 1rem;
+      position: sticky; top: 56px;
+    }
+    .right-column { display: flex; flex-direction: column; min-width: 0; }
+
+    /* ── cards ── */
+    .card {
+      background: var(--bg-1);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 1.25rem;
+    }
+    .card-title {
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--fg-2);
+      margin-bottom: 1rem;
+    }
+    .card-title-opt { font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--fg-3); }
+
+    /* ── form elements ── */
+    label.field-label {
+      display: block;
+      font-size: 11.5px; font-weight: 500; color: var(--fg-2);
+      margin-bottom: 0.3rem;
+    }
+    input[type="text"], textarea {
+      width: 100%;
+      background: var(--bg); border: 1px solid var(--line-2);
+      border-radius: 8px; padding: 0.5rem 0.75rem;
+      color: var(--fg); font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+      transition: border-color .15s, box-shadow .15s;
+      -webkit-appearance: none;
+    }
+    textarea { min-height: 110px; resize: vertical; }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    /* ── provider tabs ── */
+    .provider-tabs { display: flex; gap: 6px; margin-bottom: 1rem; }
+    .provider-tab {
+      flex: 1; height: 30px;
+      background: var(--bg-2); border: 1px solid var(--line);
+      color: var(--fg-2); border-radius: 8px;
+      font: inherit; font-size: 13px; font-weight: 500; cursor: pointer;
+      transition: all .15s;
+    }
+    .provider-tab:hover:not(.active) { border-color: var(--line-2); color: var(--fg); }
+    .provider-tab.active {
+      background: var(--accent-soft);
+      border-color: var(--accent-line);
+      color: var(--accent);
+    }
+
+    .repo-fields { display: flex; gap: 8px; }
+    .repo-field { flex: 1; min-width: 0; }
+    .example-links { margin-top: 0.6rem; font-size: 12px; color: var(--fg-3); }
+    .example-links a { color: var(--accent); text-decoration: none; margin-left: 6px; }
+    .example-links a:hover { text-decoration: underline; }
+
+    /* ── config toggle ── */
+    .config-toggle {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: none; border: none; padding: 0;
+      color: var(--accent); font: inherit; font-size: 13px; cursor: pointer;
+      margin-top: 0.25rem;
+    }
+    .config-toggle:hover { text-decoration: underline; }
+    #config-section { display: none; margin-top: 0.75rem; }
+    #config-section.visible { display: block; }
+    .config-docs { margin-top: 0.4rem; font-size: 11.5px; color: var(--fg-3); }
+    .config-docs a { color: var(--accent); text-decoration: none; }
+    .config-docs a:hover { text-decoration: underline; }
+
+    /* ── format pills (rules-tabs style) ── */
+    .format-selector { display: flex; flex-wrap: wrap; gap: 6px; }
+    .format-pill {
+      display: inline-flex; align-items: center;
+      padding: 5px 11px;
+      background: var(--bg-2); border: 1px solid var(--line);
+      color: var(--fg-2); border-radius: 999px;
+      font: inherit; font-size: 12.5px; font-weight: 500;
+      cursor: pointer; user-select: none;
+      transition: all .15s;
+    }
+    .format-pill input { display: none; }
+    .format-pill:hover { border-color: var(--line-2); color: var(--fg); }
+    .format-pill.checked {
+      background: var(--accent-soft);
+      border-color: var(--accent-line);
+      color: var(--accent);
+    }
+
+    /* ── placeholder ── */
+    #placeholder {
+      text-align: center; padding: 4rem 2rem;
+      color: var(--fg-3);
+      border: 1px dashed var(--line-2);
+      border-radius: 14px; background: var(--bg-1);
+    }
+    #placeholder p + p { font-size: 13.5px; margin-top: 0.4rem; }
+    #placeholder p:first-child { font-size: 16px; color: var(--fg-2); }
+
+    /* ── error box ── */
+    .error-box {
+      border: 1px solid var(--err); border-radius: 10px;
+      padding: 0.875rem 1rem; margin-bottom: 1rem;
+      background: oklch(0.68 0.18 25 / 0.1);
+      color: var(--err); font-size: 13.5px;
+    }
+    @supports not (color: oklch(0 0 0)) {
+      .error-box { background: rgba(239,68,68,0.1); }
+    }
+
+    /* ── stats panel ── */
+    #stats-panel {
+      margin-bottom: 1rem;
+      border-color: var(--accent-line);
+      background: linear-gradient(135deg, var(--bg-1) 0%, oklch(0.72 0.16 295 / 0.06) 100%);
+      box-shadow: 0 4px 24px oklch(0.72 0.16 295 / 0.10);
+    }
+    @supports not (color: oklch(0 0 0)) {
+      #stats-panel {
+        background: linear-gradient(135deg, var(--bg-1) 0%, rgba(124,111,224,0.06) 100%);
+        box-shadow: 0 4px 24px rgba(124,111,224,0.10);
+      }
+    }
+    .score-row {
+      display: flex; align-items: center; gap: 20px;
+      padding-bottom: 1rem; margin-bottom: 1rem;
+      border-bottom: 1px solid var(--line);
+      flex-wrap: wrap;
+    }
+    .score-ring {
+      --p: 0;
+      width: 76px; height: 76px; border-radius: 50%;
+      background: conic-gradient(var(--accent) calc(var(--p) * 1%), var(--bg-3) 0);
+      display: grid; place-items: center;
+      position: relative; flex-shrink: 0;
+      transition: background .5s cubic-bezier(.4,0,.2,1);
+    }
+    .score-ring::before {
+      content: ""; position: absolute; inset: 7px;
+      border-radius: 50%; background: var(--bg-1);
+    }
+    .score-ring-num {
+      position: relative;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700; font-size: 18px;
+      font-variant-numeric: tabular-nums;
+    }
+    .score-info { display: flex; flex-direction: column; gap: 3px; }
+    .score-desc { font-size: 11px; color: var(--fg-2); text-transform: uppercase; letter-spacing: 0.07em; font-weight: 600; }
+    .score-grade {
+      font-size: 32px; font-weight: 800; letter-spacing: -0.04em; line-height: 1;
+    }
+    .grade-a { color: var(--pass); }
+    .grade-b { color: oklch(0.76 0.14 155); }
+    .grade-c { color: var(--warn); }
+    .grade-d { color: oklch(0.72 0.16 45); }
+    .grade-f { color: var(--err); }
+    @supports not (color: oklch(0 0 0)) {
+      .grade-b { color: #6ee7b7; }
+      .grade-d { color: #f97316; }
+    }
+    .score-badge { margin-left: auto; align-self: center; }
+    .badge-img { display: block; border-radius: 4px; }
+    .stat-counts {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    }
+    .stat-count {
+      background: var(--bg-2); border: 1px solid var(--line);
+      border-radius: 10px; padding: 12px 14px;
+    }
+    .stat-count-header {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+    }
+    .stat-ico {
+      width: 24px; height: 24px; border-radius: 7px;
+      display: grid; place-items: center; flex-shrink: 0;
+    }
+    .stat-ico.ico-issues { background: oklch(0.68 0.18 25 / 0.14); color: var(--err); }
+    .stat-ico.ico-files  { background: var(--accent-soft); color: var(--accent); }
+    .stat-ico.ico-time   { background: oklch(0.74 0.13 155 / 0.14); color: var(--pass); }
+    @supports not (color: oklch(0 0 0)) {
+      .stat-ico.ico-issues { background: rgba(239,68,68,0.14); }
+      .stat-ico.ico-time   { background: rgba(16,185,129,0.14); }
+    }
+    .stat-count b {
+      font-size: 20px; font-weight: 700; letter-spacing: -0.03em;
+      font-variant-numeric: tabular-nums; line-height: 1;
+    }
+    .stat-count-label {
+      font-size: 10.5px; color: var(--fg-2);
+      text-transform: uppercase; letter-spacing: 0.07em; font-weight: 600;
+    }
+
+    /* ── tabs ── */
+    .result-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1rem; }
+    .tab {
+      display: inline-flex; align-items: center;
+      padding: 5px 12px;
+      background: var(--bg-2); border: 1px solid var(--line);
+      color: var(--fg-2); border-radius: 999px;
+      font: inherit; font-size: 12.5px; font-weight: 500;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .tab:hover { border-color: var(--line-2); color: var(--fg); }
+    .tab.active {
+      background: var(--accent-soft);
+      border-color: var(--accent-line);
+      color: var(--accent); font-weight: 600;
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ── output header ── */
+    .output-header { display: flex; justify-content: flex-end; gap: 6px; margin-bottom: 0.75rem; }
+
+    /* ── code blocks ── */
+    pre {
+      background: var(--bg); border: 1px solid var(--line);
+      border-radius: 10px; padding: 1rem;
+      font-size: 12.5px; line-height: 1.6;
+      overflow-x: auto; max-width: 100%;
+    }
+    pre code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px; white-space: pre;
+    }
+    pre.terminal-output { color: var(--fg); }
+    .rule-feedback {
+      display: flex; align-items: center; gap: 10px;
+      margin-top: 1rem;
+      padding: 11px 14px;
+      background: var(--bg-1); border: 1px solid var(--line);
+      border-radius: 10px;
+      font-size: 13px; color: var(--fg-2);
+    }
+    .rule-feedback svg { flex-shrink: 0; color: var(--fg-3); }
+    .rule-feedback a {
+      display: inline-flex; align-items: center; gap: 5px;
+      margin-left: auto;
+      height: 28px; padding: 0 11px;
+      background: var(--bg-2); border: 1px solid var(--line-2);
+      color: var(--fg-1); border-radius: 7px;
+      font-size: 12px; font-weight: 500; text-decoration: none;
+      white-space: nowrap;
+      transition: background .12s, color .12s, border-color .12s;
+    }
+    .rule-feedback a:hover { background: var(--bg-3); color: var(--fg); border-color: var(--accent-line); }
+    iframe {
+      width: 100%; height: 600px;
+      border: 1px solid var(--line); border-radius: 10px;
+      background: #fff;
+    }
+
+    /* ── focus / a11y ── */
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+    .btn-run:focus-visible, .nav-gh:focus-visible {
+      outline: 2px solid var(--accent); outline-offset: 3px;
+      box-shadow: 0 0 0 4px var(--accent-soft);
+    }
+
+    /* ── responsive ── */
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .left-column { position: static; }
+    }
+    @media (max-width: 560px) {
+      .container { padding: 0 1rem 3rem; }
+      .stat-counts { grid-template-columns: 1fr 1fr; }
+      .score-row { gap: 14px; }
+      .score-grade { font-size: 26px; }
+    }
+
+    /* ── reduced motion ── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+      }
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TSSQ2HZX"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="nav" role="banner">
+    <div class="nav-inner">
+      <a class="brand" href="/">
+        <img src="https://raw.githubusercontent.com/Kodaskills/oplint/refs/heads/main/docs/logo.svg" alt="oplint logo" width="24" height="24" />
+        oplint
+      </a>
+      <nav class="nav-actions" aria-label="External links">
+        <a class="nav-gh" href="https://github.com/kodaskills/oplint" target="_blank" rel="noopener noreferrer">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <path d="M8 0a8 8 0 0 0-2.5 15.6c.4.07.55-.17.55-.38v-1.34c-2.2.48-2.67-1.06-2.67-1.06-.36-.92-.88-1.16-.88-1.16-.72-.49.05-.48.05-.48.8.06 1.22.82 1.22.82.71 1.21 1.86.86 2.31.66.07-.51.28-.86.5-1.06-1.76-.2-3.6-.88-3.6-3.92 0-.87.31-1.58.82-2.13-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.81a7.6 7.6 0 0 1 4 0c1.53-1.02 2.2-.81 2.2-.81.44 1.1.16 1.92.08 2.12.51.55.82 1.26.82 2.13 0 3.05-1.85 3.72-3.61 3.91.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 8 0Z"/>
+          </svg>
+          GitHub
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="page-header">
+        <p>Lint any Obsidian plugin for compliance — right from your browser.</p>
+        <p>
+          Live demo of <a href="https://github.com/kodaskills/oplint" target="_blank" rel="noopener noreferrer">oplint</a>.
+          Same engine runs in CI via
+          <a href="https://github.com/kodaskills/oplint-action" target="_blank" rel="noopener noreferrer">oplint-action</a>
+          — lint on push, badge, PR comment, HTML artifact.
+        </p>
+        <div class="disclaimer" role="note">
+          <span class="disclaimer-icon" aria-hidden="true">⏳</span>
+          <span>
+            <strong>Heads up — first run may be slow.</strong>
+            Hosted on <a href="https://render.com" target="_blank" rel="noopener noreferrer">Render</a>'s free plan ❤️
+            (0.1 CPU · 512 MB), which spins down after inactivity — cold start can take 30–60 s.
+            Each run also clones the plugin repository before linting it, adding network time.
+            Neither reflects real lint performance — oplint lints a typical plugin in 500 ms – 5 s locally or in CI.
+          </span>
+        </div>
+      </div>
+
+      <div class="layout">
+        <!-- ── LEFT COLUMN ── -->
+        <div class="left-column">
+
+          <div class="card">
+            <p class="card-title">Repository</p>
+            <div class="provider-tabs" role="group" aria-label="Git provider">
+              <button class="provider-tab" id="btn-github" onclick="setProvider('github')" aria-pressed="true">GitHub</button>
+              <button class="provider-tab" id="btn-gitlab" onclick="setProvider('gitlab')" aria-pressed="false">GitLab</button>
+            </div>
+            <div class="repo-fields">
+              <div class="repo-field">
+                <label class="field-label" for="repo-owner">Username / Org</label>
+                <input type="text" id="repo-owner" placeholder="nothingislost" autocomplete="off" spellcheck="false">
+              </div>
+              <div class="repo-field">
+                <label class="field-label" for="repo-name">Repository</label>
+                <input type="text" id="repo-name" placeholder="obsidian-day-planner" autocomplete="off" spellcheck="false">
+              </div>
+            </div>
+            <div class="example-links">
+              Try:
+              <a href="#" onclick="setExample('SilentVoid13','Templater');return false;">Templater</a>
+              <a href="#" onclick="setExample('liamcain','obsidian-calendar-plugin');return false;">calendar</a>
+            </div>
+          </div>
+
+          <div class="card">
+            <p class="card-title">
+              Configuration
+              <span class="card-title-opt"> (optional)</span>
+            </p>
+            <button class="config-toggle" onclick="toggleConfig()" aria-expanded="false" aria-controls="config-section">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 1v10M1 6h10"/></svg>
+              Add .oplint.yaml config
+            </button>
+            <div id="config-section" role="region">
+              <label class="field-label" for="config-yaml" style="margin-top:.75rem;">.oplint.yaml content</label>
+              <textarea id="config-yaml" placeholder="rules:&#10;  enabled: all&#10;  skip_accuracy:&#10;    - approximate"></textarea>
+              <p class="config-docs">
+                <a href="https://github.com/Kodaskills/oplint#config-reference" target="_blank" rel="noopener noreferrer">View config documentation →</a>
+              </p>
+            </div>
+          </div>
+
+          <div class="card">
+            <p class="card-title">
+              Report Formats
+              <span class="card-title-opt"> (select at least one)</span>
+            </p>
+            <div class="format-selector" id="format-selector" role="group" aria-label="Output formats">
+              <label class="format-pill checked"><input type="checkbox" value="json" checked>JSON</label>
+              <label class="format-pill"><input type="checkbox" value="toml">TOML</label>
+              <label class="format-pill"><input type="checkbox" value="yaml">YAML</label>
+              <label class="format-pill"><input type="checkbox" value="markdown">Markdown</label>
+              <label class="format-pill"><input type="checkbox" value="terminal">Terminal</label>
+              <label class="format-pill"><input type="checkbox" value="table">Table</label>
+              <label class="format-pill"><input type="checkbox" value="html">HTML</label>
+            </div>
+          </div>
+
+          <button class="btn-run" id="run-btn" onclick="runLint()">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><polygon points="3,2 14,8 3,14"/></svg>
+            <span id="btn-text">Run oplint</span>
+            <span class="spinner" id="spinner" aria-hidden="true"></span>
+          </button>
+
+        </div>
+
+        <!-- ── RIGHT COLUMN ── -->
+        <div class="right-column">
+
+          <div id="stats-panel" class="card" style="display:none;" aria-live="polite">
+            <div class="score-row">
+              <div class="score-ring" id="score-ring" role="img" aria-label="Compliance score">
+                <span class="score-ring-num" id="score-value">—</span>
+              </div>
+              <div class="score-info">
+                <span class="score-desc">Compliance grade</span>
+                <span class="score-grade" id="grade-value">—</span>
+              </div>
+              <div class="score-badge" id="badge-container"></div>
+            </div>
+            <div class="stat-counts">
+              <div class="stat-count">
+                <div class="stat-count-header">
+                  <div class="stat-ico ico-issues" aria-hidden="true">
+                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 6v3M8 11h.01M7.1 2.4 1.6 11.5c-.4.7 0 1.5.9 1.5h11c.9 0 1.3-.8.9-1.5L8.9 2.4c-.4-.7-1.4-.7-1.8 0Z"/></svg>
+                  </div>
+                  <b id="issues-count">—</b>
+                </div>
+                <span class="stat-count-label">Issues</span>
+              </div>
+              <div class="stat-count">
+                <div class="stat-count-header">
+                  <div class="stat-ico ico-files" aria-hidden="true">
+                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 2H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V6L9 2Z"/><path d="M9 2v4h4"/></svg>
+                  </div>
+                  <b id="files-analyzed">—</b>
+                </div>
+                <span class="stat-count-label">Files</span>
+              </div>
+              <div class="stat-count">
+                <div class="stat-count-header">
+                  <div class="stat-ico ico-time" aria-hidden="true">
+                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 1.5"/></svg>
+                  </div>
+                  <b id="lint-duration">—</b>
+                </div>
+                <span class="stat-count-label">Duration</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="results" style="display:none;" aria-live="polite">
+            <div class="card">
+              <div id="error-box" class="error-box" style="display:none;" role="alert"></div>
+              <div class="result-tabs" id="result-tabs" role="tablist"></div>
+              <div id="result-contents"></div>
+            </div>
+          </div>
+
+          <div id="placeholder" aria-live="polite">
+            <p>No results yet</p>
+            <p>Select a repository and formats, then click "Run oplint"</p>
+          </div>
+
+          <div class="rule-feedback">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1ZM8 11h.01M8 5v4"/></svg>
+            <span>oplint is battle-tested but still young — if a rule fires incorrectly, is broken, or anything looks off, please let us know.</span>
+            <a href="https://github.com/Kodaskills/oplint/issues/new?template=rule_feedback.yml" target="_blank" rel="noopener noreferrer">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0a8 8 0 0 0-2.5 15.6c.4.07.55-.17.55-.38v-1.34c-2.2.48-2.67-1.06-2.67-1.06-.36-.92-.88-1.16-.88-1.16-.72-.49.05-.48.05-.48.8.06 1.22.82 1.22.82.71 1.21 1.86.86 2.31.66.07-.51.28-.86.5-1.06-1.76-.2-3.6-.88-3.6-3.92 0-.87.31-1.58.82-2.13-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.81a7.6 7.6 0 0 1 4 0c1.53-1.02 2.2-.81 2.2-.81.44 1.1.16 1.92.08 2.12.51.55.82 1.26.82 2.13 0 3.05-1.85 3.72-3.61 3.91.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 8 0Z"/></svg>
+              Give feedback
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/markdown.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/toml.min.js"></script>
+
+  <script>
+    'use strict';
+
+    let provider = 'github';
+    let currentReports = {};
+
+    /* ── provider ── */
+    function setProvider(p) {
+      provider = p;
+      const gh = document.getElementById('btn-github');
+      const gl = document.getElementById('btn-gitlab');
+      gh.classList.toggle('active', p === 'github');
+      gl.classList.toggle('active', p === 'gitlab');
+      gh.setAttribute('aria-pressed', String(p === 'github'));
+      gl.setAttribute('aria-pressed', String(p === 'gitlab'));
+    }
+
+    function setExample(owner, repo) {
+      document.getElementById('repo-owner').value = owner;
+      document.getElementById('repo-name').value = repo;
+    }
+
+    /* ── config toggle ── */
+    function toggleConfig() {
+      const section = document.getElementById('config-section');
+      const btn = document.querySelector('.config-toggle');
+      const open = section.classList.toggle('visible');
+      btn.setAttribute('aria-expanded', String(open));
+    }
+
+    /* ── format pills ── */
+    document.querySelectorAll('.format-pill input').forEach(cb => {
+      cb.addEventListener('change', () => {
+        cb.closest('.format-pill').classList.toggle('checked', cb.checked);
+      });
+    });
+
+    function getSelectedFormats() {
+      const checked = [...document.querySelectorAll('#format-selector input:checked')].map(cb => cb.value);
+      return checked.length > 0 ? checked : ['json'];
+    }
+
+    /* ── score panel ── */
+    function updateScorePanel(score, grade, issuesCount, filesAnalyzed, lintDurationMs) {
+      const panel = document.getElementById('stats-panel');
+      if (score === null && grade === null) {
+        panel.style.display = 'none';
+        return;
+      }
+      panel.style.display = 'block';
+
+      if (score !== null) {
+        const pct = Math.min(100, Math.max(0, Math.round(score)));
+        document.getElementById('score-ring').style.setProperty('--p', pct);
+        document.getElementById('score-value').textContent = score.toFixed(1);
+      }
+      if (grade !== null) {
+        const el = document.getElementById('grade-value');
+        el.textContent = grade;
+        el.className = 'score-grade grade-' + grade.toLowerCase();
+      }
+      if (issuesCount !== null) document.getElementById('issues-count').textContent = issuesCount;
+      if (filesAnalyzed !== null) document.getElementById('files-analyzed').textContent = filesAnalyzed;
+      if (lintDurationMs !== null) {
+        const dur = lintDurationMs < 1000
+          ? lintDurationMs + 'ms'
+          : (lintDurationMs / 1000).toFixed(2) + 's';
+        document.getElementById('lint-duration').textContent = dur;
+      }
+      if (grade !== null && score !== null) {
+        const s = Math.round(score);
+        const color = s < 50 ? 'red' : s < 70 ? 'orange' : s < 90 ? 'yellow' : s < 100 ? 'green' : 'brightgreen';
+        const message = grade + ' · ' + s + '%';
+        const logo = 'data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIzNiAzMiA1NiA2NCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNjQgMzYgTDg4IDQ0IFY2NCBDODggNzggNzYgODggNjQgOTIgQzUyIDg4IDQwIDc4IDQwIDY0IFY0NCBaIiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNNTIgNjQgTDYyIDc0IEw3OCA1NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L3N2Zz4=';
+        const url = 'https://img.shields.io/badge/'
+          + encodeURIComponent('oplint') + '-'
+          + encodeURIComponent(message) + '-'
+          + color
+          + '?style=for-the-badge&logo=' + encodeURIComponent(logo);
+        document.getElementById('badge-container').innerHTML =
+          '<img class="badge-img" src="' + url + '" alt="oplint ' + message + '" height="28">';
+      }
+    }
+
+    /* ── tab utils ── */
+    function switchTab(format) {
+      document.querySelectorAll('.tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.format === format);
+        t.setAttribute('aria-selected', String(t.dataset.format === format));
+      });
+      document.querySelectorAll('.tab-content').forEach(c => {
+        c.classList.toggle('active', c.id === 'tab-' + format);
+      });
+      const active = document.querySelector('.tab[data-format="' + format + '"]');
+      if (active) active.focus();
+    }
+
+    function getLanguageClass(format) {
+      return { json: 'json', toml: 'toml', yaml: 'yaml', markdown: 'markdown' }[format] || 'plaintext';
+    }
+
+    /* ── ANSI → HTML ── */
+    const ANSI_MAP = {
+      '1': 'font-weight:bold', '3': 'font-style:italic', '4': 'text-decoration:underline',
+      '30': 'color:#4b5563', '31': 'color:#ef4444', '32': 'color:#10b981',
+      '33': 'color:#fbbf24', '34': 'color:#3b82f6', '35': 'color:#a855f7',
+      '36': 'color:#06b6d4', '37': 'color:#e5e7eb', '90': 'color:#6b7280',
+      '91': 'color:#f87171', '92': 'color:#34d399', '93': 'color:#fcd34d',
+      '94': 'color:#60a5fa', '95': 'color:#c084fc', '96': 'color:#22d3ee',
+      '97': 'color:#f9fafb',
+    };
+
+    function escapeHtml(text) {
+      const d = document.createElement('div');
+      d.textContent = text;
+      return d.innerHTML;
+    }
+
+    function ansiToHtml(text) {
+      const regex = /\x1b\[([0-9;]*)m/g;
+      let out = '', last = 0, depth = 0, m;
+      while ((m = regex.exec(text)) !== null) {
+        out += escapeHtml(text.slice(last, m.index));
+        for (const c of m[1].split(';').filter(Boolean)) {
+          if (c === '0') { out += '</span>'.repeat(depth); depth = 0; }
+          else if (ANSI_MAP[c]) { out += '<span style="' + ANSI_MAP[c] + '">'; depth++; }
+        }
+        last = regex.lastIndex;
+      }
+      out += escapeHtml(text.slice(last));
+      out += '</span>'.repeat(depth);
+      return out;
+    }
+
+    /* ── copy / download / fullscreen ── */
+    function copyReport(btn, content) {
+      navigator.clipboard.writeText(content).then(() => {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+      });
+    }
+
+    function downloadReport(format, content) {
+      const ext = { terminal: 'txt', table: 'txt', html: 'html' }[format] || format;
+      const mime = format === 'html' ? 'text/html' : 'text/plain';
+      const url = URL.createObjectURL(new Blob([content], { type: mime }));
+      const a = Object.assign(document.createElement('a'), { href: url, download: 'oplint-report.' + ext });
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function openFullscreen(format, content) {
+      const win = window.open('', '_blank');
+      if (!win) {
+        alert('Popup blocked. Please allow popups for this site.');
+        return;
+      }
+      if (format === 'html') {
+        // Sandbox server HTML in an iframe via srcdoc — never document.write untrusted content
+        const iframe = win.document.createElement('iframe');
+        iframe.srcdoc = content;
+        iframe.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;border:none;';
+        win.document.documentElement.style.margin = '0';
+        win.document.body.style.margin = '0';
+        win.document.body.appendChild(iframe);
+      } else {
+        // Content is pre-escaped by escapeHtml / ansiToHtml — safe to set via innerHTML
+        const isTerminal = format === 'terminal' || format === 'table';
+        const style = win.document.createElement('style');
+        style.textContent = 'body{background:#0a0b10;color:#ece8e0;font-family:"JetBrains Mono",monospace;padding:2rem;margin:0}pre{white-space:pre-wrap;word-wrap:break-word}';
+        win.document.head.appendChild(style);
+        win.document.title = 'oplint ' + format.toUpperCase() + ' Report';
+        const container = win.document.createElement(isTerminal ? 'div' : 'pre');
+        container.innerHTML = isTerminal ? ansiToHtml(content) : escapeHtml(content);
+        win.document.body.appendChild(container);
+      }
+    }
+
+    /* ── render results ── */
+    function createResultTab(format, content, isFirst) {
+      const isTerminal = format === 'terminal' || format === 'table';
+      const isHtml = format === 'html';
+
+      const tabBtn = document.createElement('button');
+      tabBtn.className = 'tab' + (isFirst ? ' active' : '');
+      tabBtn.dataset.format = format;
+      tabBtn.textContent = format.toUpperCase();
+      tabBtn.setAttribute('role', 'tab');
+      tabBtn.setAttribute('aria-selected', String(isFirst));
+      tabBtn.setAttribute('aria-controls', 'tab-' + format);
+      tabBtn.onclick = () => switchTab(format);
+
+      const contentDiv = document.createElement('div');
+      contentDiv.id = 'tab-' + format;
+      contentDiv.className = 'tab-content' + (isFirst ? ' active' : '');
+      contentDiv.setAttribute('role', 'tabpanel');
+
+      const header = document.createElement('div');
+      header.className = 'output-header';
+
+      if (!isHtml) {
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'btn-sm';
+        copyBtn.textContent = 'Copy';
+        copyBtn.onclick = e => copyReport(e.currentTarget, content);
+        header.appendChild(copyBtn);
+      }
+
+      const dlBtn = document.createElement('button');
+      dlBtn.className = 'btn-sm';
+      dlBtn.textContent = 'Download';
+      dlBtn.onclick = () => downloadReport(format, content);
+      header.appendChild(dlBtn);
+
+      const fsBtn = document.createElement('button');
+      fsBtn.className = 'btn-sm';
+      fsBtn.textContent = 'Fullscreen';
+      fsBtn.onclick = () => openFullscreen(format, content);
+      header.appendChild(fsBtn);
+
+      contentDiv.appendChild(header);
+
+      if (isHtml) {
+        const iframe = document.createElement('iframe');
+        iframe.title = 'HTML report';
+        iframe.srcdoc = content;
+        contentDiv.appendChild(iframe);
+      } else {
+        const pre = document.createElement('pre');
+        if (isTerminal) pre.className = 'terminal-output';
+        const code = document.createElement('code');
+        if (isTerminal) {
+          code.innerHTML = ansiToHtml(content);
+        } else {
+          code.className = 'language-' + getLanguageClass(format);
+          if (format === 'json') {
+            try { code.textContent = JSON.stringify(JSON.parse(content), null, 2); }
+            catch { code.textContent = content; }
+          } else {
+            code.textContent = content;
+          }
+          if (typeof hljs !== 'undefined') hljs.highlightElement(code);
+        }
+        pre.appendChild(code);
+        contentDiv.appendChild(pre);
+      }
+
+      return { tabBtn, contentDiv };
+    }
+
+    function displayResults(reports, score, grade, issuesCount, filesAnalyzed, lintDurationMs) {
+      const tabsEl = document.getElementById('result-tabs');
+      const contentsEl = document.getElementById('result-contents');
+      tabsEl.innerHTML = '';
+      contentsEl.innerHTML = '';
+      currentReports = reports;
+
+      Object.keys(reports).forEach((format, i) => {
+        const { tabBtn, contentDiv } = createResultTab(format, reports[format], i === 0);
+        tabsEl.appendChild(tabBtn);
+        contentsEl.appendChild(contentDiv);
+      });
+
+      updateScorePanel(score, grade, issuesCount, filesAnalyzed, lintDurationMs);
+      document.getElementById('results').style.display = 'block';
+      document.getElementById('placeholder').style.display = 'none';
+    }
+
+    /* ── lint ── */
+    async function runLint() {
+      const owner = document.getElementById('repo-owner').value.trim();
+      const repo  = document.getElementById('repo-name').value.trim();
+      if (!owner || !repo) {
+        alert('Please enter a username/organization and repository name.');
+        return;
+      }
+
+      const btn     = document.getElementById('run-btn');
+      const spinner = document.getElementById('spinner');
+      const btnText = document.getElementById('btn-text');
+      const errBox  = document.getElementById('error-box');
+
+      btn.disabled = true;
+      spinner.style.display = 'inline-block';
+      btnText.textContent = 'Running…';
+      document.getElementById('results').style.display = 'none';
+      document.getElementById('stats-panel').style.display = 'none';
+      document.getElementById('placeholder').style.display = 'none';
+      errBox.style.display = 'none';
+
+      const payload = { provider, owner, repo, formats: getSelectedFormats() };
+      const config = document.getElementById('config-yaml').value.trim();
+      if (config) {
+        if (config.length > 50_000) {
+          alert('Config too large (max 50 KB).');
+          btn.disabled = false; spinner.style.display = 'none'; btnText.textContent = 'Run oplint';
+          return;
+        }
+        payload.config = config;
+      }
+
+      try {
+        const resp = await fetch('/lint', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await resp.json();
+        if (data.error) {
+          errBox.textContent = data.error;
+          errBox.style.display = 'block';
+          document.getElementById('results').style.display = 'block';
+          document.getElementById('placeholder').style.display = 'none';
+        } else {
+          displayResults(
+            data.reports || {},
+            data.score, data.grade,
+            data.issues_count, data.files_analyzed, data.lint_duration_ms
+          );
+        }
+      } catch (err) {
+        errBox.textContent = 'Request failed: ' + err.message;
+        errBox.style.display = 'block';
+        document.getElementById('results').style.display = 'block';
+        document.getElementById('placeholder').style.display = 'none';
+      } finally {
+        btn.disabled = false;
+        spinner.style.display = 'none';
+        btnText.textContent = 'Run oplint';
+      }
+    }
+
+    /* ── init ── */
+    setProvider('github');
+  </script>
+</body>
+</html>

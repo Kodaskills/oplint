@@ -1,0 +1,119 @@
+# Default: list all recipes
+default:
+    @just --list
+
+# ── Local development (host Rust) ──────────────────────────#
+
+# Run the server locally (cargo run)
+[group('dev')]
+run:
+    cd server && cargo run
+
+# Run with hot‑reload (requires cargo-watch)
+[group('dev')]
+watch:
+    cargo watch -x run --workdir server/
+
+# ── Docker (unified dev & prod) ───────────────────────────#
+
+# Build and push prod image to Docker Hub. Usage: just push [tag]
+[group('docker')]
+push tag="latest":
+    docker build --target prod -t yudao/oplint-live:{{ tag }} .
+    docker push yudao/oplint-live:{{ tag }}
+
+# Start a service (dev|prod), builds automatically. Default: dev
+[group('docker')]
+up service="dev":
+    docker compose up {{ service }} --build
+
+# Build an image without starting it. Default: dev
+[group('docker')]
+build service="dev":
+    docker compose build {{ service }}
+
+# Stop **all** running services (docker compose down)
+[group('docker')]
+down:
+    docker compose down
+
+# View logs of a service. Default: dev
+[group('docker')]
+logs service="dev":
+    docker compose logs -f {{ service }}
+
+# Open a shell inside a running service. Default: dev
+[group('docker')]
+shell service="dev":
+    docker compose exec {{ service }} /bin/bash
+
+# ── Local builds (host Rust) ─────────────────────────────────#
+
+# Build the server (debug mode)
+[group('build')]
+build-local:
+    cd server && cargo build
+
+# Build the server (release mode, optimized)
+[group('build')]
+release:
+    cd server && cargo build --release
+
+# ── Code quality ─────────────────────────────────────────────#
+
+# Format Rust code
+[group('quality')]
+fmt:
+    cargo fmt --all
+
+# Lint Rust code
+[group('quality')]
+lint:
+    cargo clippy --all-targets --all-features -- -D warnings
+
+# Check for outdated dependencies
+[group('quality')]
+outdated:
+    cargo outdated --depth 1
+
+# Run all quality checks
+[group('quality')]
+check: fmt lint test doc audit outdated
+
+# ── Tests ────────────────────────────────────────────────────#
+
+# Run all tests
+[group('tests')]
+test:
+    cargo test --all-targets --all-features
+
+# ── Documentation ────────────────────────────────────────────#
+
+# Generate documentation
+[group('doc')]
+doc:
+    cargo doc --no-deps --all-features
+
+# ── Security ─────────────────────────────────────────────────#
+
+# Run security audit
+[group('security')]
+audit:
+    cargo audit
+
+# ── Deployment ──────────────────────────────────────────────#
+
+# Deploy to Render.com (requires render CLI)
+[group('deploy')]
+render-deploy:
+    render deploys create --service-type web --env docker .
+
+# Check Render deployment status
+[group('deploy')]
+render-status:
+    render deploys list
+
+# Check Railway deployment status (requires railway CLI)
+[group('deploy')]
+railway-status:
+    railway status
