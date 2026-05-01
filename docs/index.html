@@ -72,7 +72,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="hero-copy">
         <a class="badge" href="#install">
           <span class="badge-dot"></span>
-          <span>v0.1.0 · Built in Rust</span>
+          <span>Built in Rust</span>
+          <svg class="badge-heart" viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.27 2 8.5 2 5.41 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.08C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.41 22 8.5c0 3.77-3.4 6.86-8.55 11.53L12 21.35z"/></svg>
           <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="m4 2 4 4-4 4"/></svg>
         </a>
         <h1 class="h1 reveal">
@@ -87,12 +88,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <span class="h1-phrase">earn five stars.</span>
             <span class="h1-phrase">run everywhere.</span>
             <span class="h1-phrase">feel polished.</span>
+            <span class="h1-phrase">are linter standalone.</span>
           </span>
         </h1>
         <p class="lede reveal" style="--d:.4s">
-          <strong>oplint</strong> is a static-analysis CLI for the Obsidian plugin guidelines.
+          <strong>oplint</strong> is a <strong>standalone</strong> static-analysis CLI for the Obsidian plugin guidelines.
           50+ tree-sitter rules across security, manifest, mobile, API and UI —
           with HTML, JSON, Markdown reports and a one-line GitHub Action.
+          <strong>Linter-aware</strong> — works standalone whatever linter you use in your JS/TS toolchain.
         </p>
         <div class="hero-cta reveal" style="--d:.55s">
           <a class="btn btn-primary btn-lg" href="#install">
@@ -248,7 +251,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
 
     <div class="feat-grid">
-      <article class="feat feat-wide">
+      <article class="feat feat-smart">
+        <div class="feat-header">
+          <div class="feat-ico ico-linter">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M9 12l2 2 4-4"/>
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <path d="M7 7h10M7 11h10M7 15h6"/>
+            </svg>
+          </div>
+          <div class="feat-badge-smart">Standalone</div>
+        </div>
+        <h3>Linter-aware &amp; standalone</h3>
+        <p>ESLint needs plugins; Biome/Oxlint don't cover Obsidian guidelines. oplint runs standalone — no other linter required, works outside your existing JS/TS toolchain.</p>
+        <p class="muted">Rule generator for top linters on the <a href="#roadmap">roadmap</a> 🚀</p>
+      </article>
+
+      <article class="feat">
         <div class="feat-ico ico-tree">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="4" r="2"/><circle cx="6" cy="20" r="2"/><circle cx="18" cy="20" r="2"/><path d="M12 6v4M6 18v-4h12v4M12 10v4"/></svg>
         </div>
@@ -295,12 +314,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <p>Mobile rules auto-skip when <code>isDesktopOnly: true</code>. No false positives for desktop-only plugins.</p>
       </article>
 
-      <article class="feat feat-wide">
+      <article class="feat">
         <div class="feat-ico ico-ci">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
         </div>
         <h3>GitHub Action, ready to drop in</h3>
         <p>Lint on push, post a Markdown summary on the PR, attach the HTML report as an artifact, and stamp a compliance badge on your README. One YAML, zero plumbing.</p>
+      </article>
+
+      <article class="feat feat-cta">
+        <div class="feat-cta-inner">
+          <div class="feat-ico ico-roadmap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 15l4-6 4 4 4-8 4 6"/><rect x="2" y="18" width="20" height="4" rx="1"/></svg>
+          </div>
+          <h3>Want to see what's next?</h3>
+          <p>Check out the <a href="#roadmap">roadmap</a> for upcoming features — rule generators for ESLint, Biome, Oxlint, and more.</p>
+          <a class="btn btn-outlined btn-sm" href="#roadmap">View roadmap</a>
+        </div>
       </article>
     </div>
   </section>
@@ -512,7 +542,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <li><span class="rl-dot next"></span>VS Code / Obsidian editor extension with inline diagnostics</li>
           <li><span class="rl-dot next"></span>Community-contributed rule packs</li>
           <li><span class="rl-dot next"></span>Watch mode for local dev</li>
-          <li><span class="rl-dot next"></span>Export ESLint/TSlint/*Lint rules and configuration for better integration</li>
+          <li><span class="rl-dot next"></span>Rule generator & exports for top linters (ESLint, Biome, Oxlint, …) — replicate oplint ruleset everywhere</li>
         </ul>
       </div>
     </div>
@@ -538,11 +568,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <p>oplint is a community project from the Kodaskills team that encodes the publicly documented Obsidian plugin guidelines.</p>
         <p>It is not endorsed by or affiliated with the Obsidian team.</p>
       </details>
-      <details>
+       <details>
         <summary>Will it replace the official plugin review?</summary>
         <p>No — and it's not trying to. </p>
         <p>oplint catches the mechanical issues so reviewers can focus on the substantive ones (UX, scope, naming, originality).</p>
         <p>plugins that pass oplint cleanly still need a human review.</p>
+      </details>
+      <details>
+        <summary>Why not use the official Obsidian ESLint plugin?</summary>
+        <p><strong>oplint is standalone.</strong> It runs independently — no ESLint plugin to install, no toolchain lock-in. Whatever linter you use (or none), oplint just works.</p>
+        <p><strong>Other linters don't cover Obsidian guidelines.</strong> Biome and Oxlint are faster than ESLint, but they lack Obsidian-specific rules entirely. ESLint plugins only work inside ESLint.</p>
+        <p><strong>oplint is linter-aware.</strong> The <a href="#roadmap">roadmap</a> includes rule generators to export oplint's ruleset to ESLint, Biome, Oxlint, and other top linters — so you can enforce the same Obsidian rules everywhere you lint.</p>
+        <p><strong>It complements, doesn't replace.</strong> Keep your code-quality linting in ESLint if you use it, and let oplint handle Obsidian plugin compliance.</p>
       </details>
       <details>
         <summary>What's the difference between <code>exact</code> and <code>approximate</code> rules?</summary>

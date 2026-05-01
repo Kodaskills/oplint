@@ -51,6 +51,8 @@ body {
 }
 code, .mono, pre { font-family: 'JetBrains Mono', ui-monospace, monospace; font-feature-settings: 'liga' 0; font-variant-ligatures: none; }
 em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
+a { color: var(--accent); text-decoration: none; transition: color .15s, opacity .15s; }
+a:hover { color: var(--accent-2); opacity: 0.85; }
 
 /* ───────── animated background ───────── */
 .bg-grid {
@@ -177,6 +179,7 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
   box-shadow: 0 0 0 3px var(--accent-soft);
   animation: pulse 1.8s ease-in-out infinite;
 }
+.badge-rust-ico { width: 14px; height: 14px; flex-shrink: 0; }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
 
 .h1 {
@@ -661,6 +664,71 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
 .tag.exact { background: oklch(0.74 0.13 155 / 0.14); color: var(--pass); }
 .tag.heur  { background: oklch(0.72 0.11 230 / 0.14); color: var(--info); }
 .tag.approx{ background: oklch(0.78 0.14 75 / 0.14); color: var(--warn); }
+
+/* ── Smart feature card (purple/accent palette) ── */
+.feat-smart {
+  border-color: var(--accent-line);
+  background: linear-gradient(135deg, var(--bg-1) 0%, oklch(0.72 0.16 295 / 0.08) 100%);
+  box-shadow: 0 0 0 1px var(--accent-line), 0 4px 20px oklch(0.72 0.16 295 / 0.12);
+  position: relative;
+}
+.feat-smart::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, oklch(0.72 0.16 295 / 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+.feat-smart:hover { border-color: var(--accent); transform: translateY(-2px); }
+.feat-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.feat-badge-smart {
+  display: inline-block;
+  padding: 3px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: white;
+  background: var(--accent);
+  border-radius: 4px;
+  animation: pulse-badge-smart 2s ease-in-out infinite;
+}
+@keyframes pulse-badge-smart {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+/* ── CTA feature card ── */
+.feat-cta {
+  border: 2px dashed var(--accent-line);
+  border-radius: 14px;
+  background: var(--bg-1);
+  padding: 22px 22px 24px;
+  transition: border-color .15s, transform .15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.feat-cta:hover { border-color: var(--accent); transform: translateY(-2px); }
+.feat-cta-inner {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.feat-cta .feat-ico {
+  margin-bottom: 0;
+}
+.feat-cta h3 { margin: 0; font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+.feat-cta p { margin: 0; font-size: 13.5px; color: var(--fg-1); }
+.feat-cta .btn-sm { height: 30px; padding: 0 12px; font-size: 12.5px; }
 
 /* ───────── how ───────── */
 .how {

@@ -4,7 +4,8 @@
 
 # OPLint — Obsidian Plugin Linter
 
-### Static analysis CLI for **Obsidian plugin** compliance — security, manifest validation, mobile compatibility, API best practices, and UI guidelines.
+### Standalone static analysis CLI for **Obsidian plugin** compliance — security, manifest validation, mobile compatibility, API best practices, and UI guidelines.
+### Linter-aware: works whatever linter you use in your JS/TS toolchain.
 
 [![Crates.io](https://img.shields.io/crates/v/oplint?style=for-the-badge&logo=rust&color=orange)](https://crates.io/crates/oplint)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
@@ -19,6 +20,12 @@
 ---
 
 ## ✨ Features
+
+oplint is **standalone** — it runs independently, whatever linter you use in your JS/TS toolchain. No ESLint plugin to install, no toolchain lock-in.
+
+Modern linters like Biome and Oxlint are faster than ESLint, but none of them cover Obsidian plugin guidelines. ESLint plugins only work inside ESLint. oplint fills that gap: it's **linter-aware** and the [roadmap](#roadmap) includes rule generators to export oplint's ruleset to ESLint, Biome, Oxlint, and other top linters — so you can enforce the same Obsidian rules everywhere you lint.
+
+oplint doesn't replace ESLint — it complements it. Keep your code-quality linting in ESLint if you use it, and let oplint handle Obsidian plugin compliance.
 
 | Area | What OPLint checks |
 |------|--------------------|
@@ -326,6 +333,20 @@ score         = clamp(score, 0, 100)
 - **Accuracy** — `approximate` rules (which may have false positives) count the same as `exact` rules. Filter approximate rules in the report if you want a stricter baseline.
 
 These are deliberate simplifications. The score is a quick signal, not a security audit.
+
+---
+
+## ❓ FAQ
+
+### Why not use the official Obsidian ESLint plugin?
+
+**oplint is standalone.** It runs independently — no ESLint plugin to install, no toolchain lock-in. Whatever linter you use (or none), oplint just works.
+
+**Other linters don't cover Obsidian guidelines.** Biome and Oxlint are faster than ESLint, but they lack Obsidian-specific rules entirely. ESLint plugins only work inside ESLint, which locks you into that toolchain.
+
+**oplint is linter-aware.** The [roadmap](#roadmap) includes rule generators to export oplint's ruleset to ESLint, Biome, Oxlint, and other top linters — so you can enforce the same Obsidian rules everywhere you lint.
+
+**It complements, doesn't replace.** Keep your code-quality linting in ESLint if you use it, and let oplint handle Obsidian plugin compliance.
 
 ---
 
