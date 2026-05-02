@@ -7,6 +7,7 @@
 ### Standalone static analysis CLI for **Obsidian plugin** compliance — security, manifest validation, mobile compatibility, API best practices, and UI guidelines.
 ### Linter-aware: works whatever linter you use in your JS/TS toolchain.
 
+[![Live Demo](https://img.shields.io/badge/🚀%20Live%20Demo-purple?style=for-the-badge)](https://oplint-live.kodaskills.co)
 [![Crates.io](https://img.shields.io/crates/v/oplint?style=for-the-badge&logo=rust&color=orange)](https://crates.io/crates/oplint)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 [![Last Commit](https://img.shields.io/github/last-commit/kodaskills/oplint/main?style=for-the-badge)](https://github.com/kodaskills/oplint/commits/main)
