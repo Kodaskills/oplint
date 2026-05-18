@@ -32,7 +32,7 @@ indicatif = { version = "0.18.0", features = ["rayon"] }
 
 [dev-dependencies]
 tempfile = "3.27"
-assert_cmd = "2.0"
+assert_cmd = "2.2"
 
 [features]
 default = ["std", "fmt-json", "fmt-yaml", "fmt-toml", "fmt-html", "fmt-markdown", "fmt-table", "fmt-terminal"]
